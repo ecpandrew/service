@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `service`.`Building` (
   `buildingName` VARCHAR(45) NOT NULL,
   `cityID` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`buildingID`),
-  INDEX `fk_Building_City1_idx` (`cityID` ASC) VISIBLE,
+  INDEX `fk_Building_City1_idx` (`cityID` ASC) ,
   CONSTRAINT `fk_Building_City1`
     FOREIGN KEY (`cityID`)
     REFERENCES `service`.`City` (`cityID`)
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `service`.`Section` (
   `sectionName` VARCHAR(45) NOT NULL,
   `buildingID` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`sectionID`),
-  INDEX `fk_Section_Building1_idx` (`buildingID` ASC) VISIBLE,
+  INDEX `fk_Section_Building1_idx` (`buildingID` ASC) ,
   CONSTRAINT `fk_Section_Building1`
     FOREIGN KEY (`buildingID`)
     REFERENCES `service`.`Building` (`buildingID`)
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS `service`.`Room` (
   `roomName` VARCHAR(45) NOT NULL,
   `sectionID` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`roomID`),
-  INDEX `fk_Room_Section1_idx` (`sectionID` ASC) VISIBLE,
+  INDEX `fk_Room_Section1_idx` (`sectionID` ASC) ,
   CONSTRAINT `fk_Room_Section1`
     FOREIGN KEY (`sectionID`)
     REFERENCES `service`.`Section` (`sectionID`)
@@ -118,8 +118,8 @@ CREATE TABLE IF NOT EXISTS `service`.`Device` (
   `mhubID` VARCHAR(45) NOT NULL,
   `thingID` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`deviceID`),
-  INDEX `fk_Device_Mhub1_idx` (`mhubID` ASC) VISIBLE,
-  INDEX `fk_Device_Beacon1_idx` (`thingID` ASC) VISIBLE,
+  INDEX `fk_Device_Mhub1_idx` (`mhubID` ASC) ,
+  INDEX `fk_Device_Beacon1_idx` (`thingID` ASC) ,
   CONSTRAINT `fk_Device_Mhub1`
     FOREIGN KEY (`mhubID`)
     REFERENCES `service`.`Mhub` (`mhubID`)
@@ -142,9 +142,9 @@ CREATE TABLE IF NOT EXISTS `service`.`HasA` (
   `personID` INT UNSIGNED NOT NULL,
   `roomID` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`belongsToID`),
-  INDEX `fk_BelongsTo_Device1_idx` (`deviceID` ASC) VISIBLE,
-  INDEX `fk_BelongsTo_Person1_idx` (`personID` ASC) VISIBLE,
-  INDEX `fk_BelongsTo_Room1_idx` (`roomID` ASC) VISIBLE,
+  INDEX `fk_BelongsTo_Device1_idx` (`deviceID` ASC) ,
+  INDEX `fk_BelongsTo_Person1_idx` (`personID` ASC) ,
+  INDEX `fk_BelongsTo_Room1_idx` (`roomID` ASC) ,
   CONSTRAINT `fk_BelongsTo_Device1`
     FOREIGN KEY (`deviceID`)
     REFERENCES `service`.`Device` (`deviceID`)

@@ -177,11 +177,11 @@ public class SemanticResource {
         Map<String, Set<String>> insurancesAndSpecialties;
         Address ad;
         ad = dao.getAddress(h.getAddressID());
-        oc = getHospitalOccupancy(h);
+        //oc = getHospitalOccupancy(h);
         insurancesAndSpecialties = getInsurancesAndSpecialties(h);
         returnJson = "{\"name\': \'" + h.getHospitalName() + "\', "
-                + " \"nPatientsNow\": " + oc.getnPatientsNow() + ", "
-                + "\"avgWaitTime\": " + oc.getAvgWaitTime() + ", "
+                //+ " \"nPatientsNow\": " + oc.getnPatientsNow() + ", "
+                //+ "\"avgWaitTime\": " + oc.getAvgWaitTime() + ", "
                 + "\"acceptedInsurances\": "
                 + insurancesAndSpecialties.get("insurances") + ", "
                 + "\"specialities\": "

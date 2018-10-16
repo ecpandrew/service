@@ -35,7 +35,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     public void connectToDB(){
         String url = "jdbc:mariadb://localhost/h4";
         Properties props = new Properties();
-        props.setProperty("user","root");
+        props.setProperty("user","semantic");
         props.setProperty("password","semantic");
         props.setProperty("ssl","false");
         try {

@@ -1,25 +1,18 @@
 package br.pucrio.inf.lac.hospital.semantic.data;
 
 public class Room {
-    private long roomID;//Modified to long
+
+    private long roomID;
     private String roomName;
-    private String roomType;
-    private long hospitalID;//Modified to long
+    private long sectionID;
 
     public Room() {
     }
 
-    public Room(long roomID, String roomName, String roomType, long hospitalID) {
+    public Room(long roomID, String roomName, long sectionID) {
         this.roomID = roomID;
         this.roomName = roomName;
-        this.roomType = roomType;
-        this.hospitalID = hospitalID;
-    }
-
-    public Room(String roomName, String roomType, long hospitalID) {
-        this.roomName = roomName;
-        this.roomType = roomType;
-        this.hospitalID = hospitalID;
+        this.sectionID = sectionID;
     }
 
     public long getRoomID() {
@@ -38,25 +31,17 @@ public class Room {
         this.roomName = roomName;
     }
 
-    public String getRoomType() {
-        return roomType;
+    public long getSectionID() {
+        return sectionID;
     }
 
-    public void setRoomType(String roomType) {
-        this.roomType = roomType;
+    public void setSectionID(long sectionID) {
+        this.sectionID = sectionID;
     }
-
-    public long getHospitalID() {
-        return hospitalID;
-    }
-
-    public void setHospitalID(long hospitalID) {
-        this.hospitalID = hospitalID;
-    }
-
+    
     @Override
     public String toString() {
-        return "Room{" + "roomID=" + roomID + ", roomName=" + roomName + ", roomType=" + roomType + ", hospitalID=" + hospitalID + '}';
+        return "Room{" + "roomID=" + roomID + ", roomName=" + roomName + ", sectionID=" + sectionID + '}';
     }
     
 }

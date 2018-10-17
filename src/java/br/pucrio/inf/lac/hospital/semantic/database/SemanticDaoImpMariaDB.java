@@ -1,14 +1,14 @@
 package br.pucrio.inf.lac.hospital.semantic.database;
 
-import br.pucrio.inf.lac.hospital.semantic.data.AcceptedBySpecialty;
-import br.pucrio.inf.lac.hospital.semantic.data.Address;
 import br.pucrio.inf.lac.hospital.semantic.data.Beacon;
-import br.pucrio.inf.lac.hospital.semantic.data.Hospital;
-import br.pucrio.inf.lac.hospital.semantic.data.Insurance;
-import br.pucrio.inf.lac.hospital.semantic.data.PatientMHub;
+import br.pucrio.inf.lac.hospital.semantic.data.Building;
+import br.pucrio.inf.lac.hospital.semantic.data.City;
+import br.pucrio.inf.lac.hospital.semantic.data.Device;
+import br.pucrio.inf.lac.hospital.semantic.data.HasA;
+import br.pucrio.inf.lac.hospital.semantic.data.MHub;
+import br.pucrio.inf.lac.hospital.semantic.data.Person;
 import br.pucrio.inf.lac.hospital.semantic.data.Room;
-import br.pucrio.inf.lac.hospital.semantic.data.Specialty;
-import br.pucrio.inf.lac.hospital.semantic.data.Visit;
+import br.pucrio.inf.lac.hospital.semantic.data.Section;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -173,138 +173,139 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
     
     @Override
-    public long insertHospital(Hospital h){
+    public long insertBeacon(Beacon b){
         String sql;
-        sql = "INSERT INTO Hospital (hospitalName, addressID, "
-                + "latitude, longitude) VALUES (\'"
-                + h.getHospitalName()+"\', "
-                + h.getAddressID()+", "
-                + h.getLatitude()+", "
-                + h.getLongitude()+")";
-        return processInsert(sql, "hospitalID");
+        sql = "INSERT INTO Beacon (thingID, active) "
+                + "VALUES (\'"
+                + b.getThingID()+"\', ";
+        sql += (b.isActive()) ?"TRUE)" :"FALSE)";
+        return processInsert(sql, "thingID");
     }
     
 
     @Override
-    public long insertBeacon(Beacon b) {
-        String sql = "INSERT INTO Beacon (thingID, RoomID, "
-                   + "active, lastBateryChange) "
-                   + "VALUES (\'"
-                   + b.getThingID()+"\', "
-                   + b.getRoomID()+", ";
-        sql += (b.isActive()) ?"TRUE, \'" :"FALSE, \'";
-        sql+= b.getLastBateryChange()+"\')";
-        return processInsert(sql, "beaconID");
+    public long insertBuilding(Building b) {
+        String sql = "INSERT INTO Building (buildingID, buildingName, "
+                   + "cityID) VALUES ("
+                   + b.getBuildingID()+", \'"
+                   + b.getBuildingName()+"\', "
+                   + b.getCityID()+")";
+        return processInsert(sql, "buildingID");
+    }
+
+    @Override
+    public long insertCity(City c) {
+        String sql = "INSERT INTO City (cityID, cityName) "
+                   + "VALUES ("
+                   + c.getCityID()+", \'"
+                   + c.getCityName()+"\')";
+        return processInsert(sql, "cityID");
+    }
+
+    @Override
+    public long insertDevice(Device d) {
+        String sql = "INSERT INTO Device(deviceID, manufacturer, "
+                + "model, mhubID, thingID) VALUES ("
+                +d.getDeviceID()+", \'"
+                +d.getManufacturer()+"\', \'"
+                +d.getModel()+"\', \'"
+                +d.getMhubID()+"\', \'"
+                +d.getThingID()+"\')";
+        return processInsert(sql, "deviceID");
+    }
+
+    @Override
+    public long insertHasA(HasA h) {
+        String sql = "INSERT INTO HasA (hasAID, deviceID, "
+                + "personID, roomID) VALUES ("
+                +h.getHasAID()+", "
+                +h.getDeviceID()+", "
+                +h.getPersonID()+", "
+                +h.getRoomID()+")";
+        return processInsert(sql, "hasAID");
+    }
+    
+    @Override
+    public long insertMHub(MHub m) {
+        String sql = "INSERT INTO MHub(mhubID) "
+                + "VALUES (\'"+m.getMHubID()+"\')";
+        return processInsert(sql, "mhubID");
+    }
+
+    @Override
+    public long insertPerson(Person p) {
+        String sql = "INSERT INTO Person (personID, personName, personEmail) "
+                   + "VALUES ("+p.getPersonID()+", \'"
+                   + p.getPersonName()+"\', \'"
+                   + p.getPersonEmail()+"\')";
+        return processInsert(sql, "personID");
     }
 
     @Override
     public long insertRoom(Room r) {
-        String sql = "INSERT INTO Room (roomName, roomType, hospitalID) "
-                   + "VALUES (\'"
-                   + r.getRoomName()+"\', \'"
-                   + r.getRoomType()+"\', "
-                   + r.getHospitalID()+")";
+        String sql = "INSERT INTO Room (roomID, roomName, sectionID) "
+                   + "VALUES ("+r.getRoomID()+", \'"
+                   + r.getRoomName()+"\', "
+                   + r.getSectionID()+")";
         return processInsert(sql, "roomID");
     }
 
     @Override
-    public long insertAcceptedBySpecialty(AcceptedBySpecialty a) {
-        String sql = "INSERT INTO AcceptedBySpecialty(hospitalID, insuranceID, "
-                + "specialtyID, `begin`, `end`) "
-                + "VALUES ("+a.getHospitalID()+", "
-                +a.getInsuranceID()+", "
-                +a.getSpecialtyID()+", \'"
-                +a.getBegin()+"\', \'"
-                +a.getEnd()+"\')";
-        return processInsert(sql, "acceptedBySpecialtyID");
-    }
-
-    @Override
-    public long insertAddress(Address a) {
-        String sql = "INSERT INTO Address (neighborhood, city, state, street, number";
-        
-        //Check if there is a zipcode
-        sql += (a.getZipcode()!=null) ? ", zipcode" : "";
-        
-        //Check if there is addtional info
-        sql += (a.getAdditionalInfo()!=null) ? ", additionalInfo) " : ") ";
-        
-        sql += "VALUES (\'"+a.getNeighborhood()+"\', \'"
-             + a.getCity()+"\', \'"
-             + a.getState()+"\', \'"
-             + a.getStreet()+"\', "
-             + a.getNumber();
-        
-        //Check if there is a zipcode
-        sql += (a.getZipcode()!=null) ? ", \'"+a.getZipcode()+"\'" : "";
-        
-        //Check if there is addtional info
-        sql += (a.getAdditionalInfo()!=null) ? ", \'"+a.getAdditionalInfo()+"\')" : ")";
-        
-        return processInsert(sql, "addressID");
+    public long insertSection(Section s) {
+        String sql = "INSERT INTO Section(sectionID, sectionName, buildingID) "
+                   + "VALUES ("+s.getSectionID()+", \'"
+                   + s.getSectionName()+"\', "
+                   + s.getBuildingID()+")";
+        return processInsert(sql, "sectionID");
     }
     
     @Override
-    public long insertInsurance(Insurance i) {
-        String sql = "INSERT INTO Insurance(insuranceName) "
-                + "VALUES (\'"+i.getInsuranceName()+"\')";
-        return processInsert(sql, "insutanceID");
-    }
-
-    @Override
-    public long insertPatientMHub(PatientMHub p) {
-        String sql = "INSERT INTO PatientMHub (mhubID, name, birth) "
-                   + "VALUES (\'"+p.getMhubID()+"\', \'"
-                   + p.getName()+"\', \'"
-                   + p.getBirth()+"\')";
-        return processInsert(sql, "patientMHubID");
-    }
-
-    @Override
-    public long insertSpecialty(Specialty s) {
-        String sql = "INSERT INTO Specialty (specialtyName) "
-                   + "VALUES (\'"+s.getSpecialtyname()+"\')";
-        
-        return processInsert(sql, "specialtyID");
-    }
-
-    @Override
-    public long insertVisit(Visit v) {
-        String sql = "INSERT INTO Visit(patientMHubID, hospitalID, "
-                   + "specialtyID, date, hospitalScore, "
-                   + "specialityScore";
-        
-        //Check if there is a diagnostic
-        sql += (v.getDiagnostic()!=null) ?", diagnostic" :"";
-        
-        //Check if there is are reported symptoms
-        sql += (v.getReportedSymptoms()!=null) ?", reportedSymptoms) " : ") ";
-        
-        sql += "VALUES ("+v.getPatientMHubID()+", "
-             + v.getHospitalID()+", "
-             + v.getSpecialtyID()+", \'"
-             + v.getDate()+"\', "
-             + v.getHospitalScore()+", "
-             + v.getSpecialtyScore();
-        //Check if there is a diagnostic
-        sql += (v.getDiagnostic()!=null) ? ", \'"+v.getDiagnostic()+"\'" : "";
-        
-        //Check if there is are reported symptoms
-        sql += (v.getReportedSymptoms()!=null) ?", \'"+ v.getReportedSymptoms()+"\')" :")";
-        return processInsert(sql, "visitID");
-    }
-    
-    @Override
-    public boolean deleteBeacon(long beaconID) {
+    public boolean deleteBeacon(UUID thingID) {
         String sql = "DELETE FROM Beacon "
-                   + "WHERE beaconID = \'"+beaconID+"\'";
+                   + "WHERE beaconID = \'"+thingID+"\'";
         return (processUpdate(sql)>0);
     }
 
     @Override
-    public boolean deleteHospital(long hospitalID) {
-        String sql = "DELETE FROM Hospital "
-                   + "WHERE hospitalID = "+hospitalID;
+    public boolean deleteBuilding(long buildingID) {
+        String sql = "DELETE FROM Building "
+                   + "WHERE buildingID = "+buildingID;
+        return (processUpdate(sql)>0);
+    }
+
+    @Override
+    public boolean deleteCity(long cityID) {
+        String sql = "DELETE FROM City "
+                   + "WHERE cityID = "+cityID;
+        return (processUpdate(sql)>0);
+    }
+    
+    @Override
+    public boolean deleteDevice(long deviceID) {
+        String sql = "DELETE FROM Device "
+                   + "WHERE deviceID = "+deviceID;
+        return (processUpdate(sql)>0);
+    }
+
+    @Override
+    public boolean deleteHasA(long hasAID) {
+        String sql = "DELETE FROM HasA "
+                   + "WHERE hasAID = "+hasAID;
+        return (processUpdate(sql)>0);
+    }
+    
+    @Override
+    public boolean deleteMHub(UUID mhubID) {
+        String sql = "DELETE FROM MHub "
+                   + "WHERE mhubID = \'"+mhubID+"\'";
+        return (processUpdate(sql)>0);
+    }
+    
+    
+    @Override
+    public boolean deletePerson(long personID) {
+        String sql = "DELETE FROM Person "
+                   + "WHERE personID = "+personID;
         return (processUpdate(sql)>0);
     }
 
@@ -314,158 +315,91 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                    + "WHERE roomID = "+roomID;
         return (processUpdate(sql)>0);
     }
-    
-    @Override
-    public boolean deleteAcceptedBySpecialty(long acceptedBySpecialtyID) {
-        String sql = "DELETE FROM AcceptedBySpecialty "
-                   + "WHERE acceptedBySpecialtyID = \'"+acceptedBySpecialtyID+"\'";
-        return (processUpdate(sql)>0);
-    }
 
     @Override
-    public boolean deleteAddress(long addressID) {
-        String sql = "DELETE FROM Address "
-                   + "WHERE addressID = \'"+addressID+"\'";
-        return (processUpdate(sql)>0);
-    }
-    
-    @Override
-    public boolean deleteInsurance(long insuranceID) {
-        String sql = "DELETE FROM Insurance "
-                   + "WHERE insuranceID = \'"+insuranceID+"\'";
-        return (processUpdate(sql)>0);
-    }
-    
-    
-    @Override
-    public boolean deletePatientMHub(long patientMHubID) {
-        String sql = "DELETE FROM PatientMHub "
-                   + "WHERE patientMHubID = "+patientMHubID;
-        return (processUpdate(sql)>0);
-    }
-
-    @Override
-    public boolean deleteSpecialty(long specialtyID) {
-        String sql = "DELETE FROM Specialty "
-                   + "WHERE specialtyID = \'"+specialtyID+"\'";
-        return (processUpdate(sql)>0);
-    }
-
-    @Override
-    public boolean deleteVisit(long visitID) {
-        String sql = "DELETE FROM Visit "
-                   + "WHERE visitID = \'"+visitID+"\'";
+    public boolean deleteSection(long sectionID) {
+        String sql = "DELETE FROM Section "
+                   + "WHERE sectionID = "+sectionID;
         return (processUpdate(sql)>0);
     }
     
     @Override
     public boolean updateBeacon(Beacon b) {
         String sql = "UPDATE Beacon "
-                   + "SET thingID = \'"+b.getThingID()+"\', "
-                   + "roomID = "+b.getRoomID()+", active = ";
-        sql += (b.isActive()) ?"TRUE, " :"FALSE, ";
-        sql+= "lastBateryChange = \'"+b.getLastBateryChange()+"\' "
-            + "WHERE beaconID = "+b.getBeaconID();
+                   + "SET active = ";
+        sql += (b.isActive()) ?"TRUE " :"FALSE ";
+        sql += "WHERE thingID = "+b.getThingID();
         return (processUpdate(sql)>0);
     }
     
     @Override
-    public boolean updateHospital(Hospital h) {
-        String sql = "UPDATE Hospital "
-                   + "SET hospitalName = \'"+h.getHospitalName()+"\', "
-                   + "addressID = "+h.getAddressID()+", "
-                   + "latitude = "+h.getLatitude()+", "
-                   + "longitude = "+h.getLongitude()+" "
-                   + "WHERE hospitalID = "+h.getHospitalID();
-       
+    public boolean updateBuilding(Building b) {
+        String sql = "UPDATE Building "
+                   + "SET buildingName = \'"+b.getBuildingName()+"\', "
+                   + "cityID = "+b.getCityID()+" "
+                   + "WHERE buildingID = "+b.getBuildingID();
+        return (processUpdate(sql)>0);
+    }
+
+    @Override
+    public boolean updateCity(City c) {
+        String sql = "UPDATE City "
+                   + "SET cityName = \'"+c.getCityName()+"\' "
+                   + "WHERE cityID = "+c.getCityID();
+        return (processUpdate(sql)>0);
+    }
+    
+    @Override
+    public boolean updateDevice(Device d) {
+        String sql = "UPDATE Device "
+                   + "SET manufacturer = \'"+d.getManufacturer()+"\', "
+                   + "model = \'"+d.getModel()+"\', "
+                   + "mhubID = \'"+d.getMhubID()+"\', "
+                   + "thingID = \'"+d.getThingID()+"\' "
+                   + "WHERE deviceID = "+d.getDeviceID();
+        return (processUpdate(sql)>0);
+    }
+
+    @Override
+    public boolean updateHasA(HasA h) {
+        String sql = "UPDATE HasA "
+                   + "SET deviceID = "+h.getDeviceID()+", "
+                   + "personID = "+h.getPersonID()+", "
+                   + "roomID = "+h.getRoomID()+" "
+                   + "WHERE hasAID = "+h.getHasAID();
+        return (processUpdate(sql)>0);
+    }
+    /*
+    @Override
+    public boolean updateMHub(MHub m) {
+        String sql = "UPDATE MHub "
+                   + "SET insuranceName = \'"+i.getInsuranceName()+"\' "
+                   + "WHERE mhubID = "+m.getMHubID();
+        return (processUpdate(sql)>0);
+    }*/
+    
+    @Override
+    public boolean updatePerson(Person p) {
+        String sql = "UPDATE Person "
+                   + "SET name = \'"+p.getPersonName()+"\', "
+                   + "email = \'"+p.getPersonEmail()+"\' "
+                   + "WHERE persomID = "+p.getPersonID();
         return (processUpdate(sql)>0);
     }
 
     @Override
     public boolean updateRoom(Room r) {
         String sql = "UPDATE Room "
-                   + "SET roomName = \'"+r.getRoomName()+"\', "
-                   + "roomType = \'"+r.getRoomType()+"\', "
-                   + "hospitalID = "+r.getHospitalID()+" "
+                   + "SET roomName = \'"+r.getRoomName()+"\' "
                    + "WHERE roomID = "+r.getRoomID();
         return (processUpdate(sql)>0);
     }
-    
-    @Override
-    public boolean updateAcceptedBySpecialty(AcceptedBySpecialty a) {
-        String sql = "UPDATE AcceptedBySpecialty "
-                   + "SET hospitalID = "+a.getHospitalID()+", "
-                   + "insuranceID = "+a.getInsuranceID()+", "
-                   + "specialtyID = "+a.getSpecialtyID()+", "
-                   + "begin = \'"+a.getBegin()+"\', "
-                   + "end = \'"+a.getEnd()+"\' "
-                   + "WHERE acceptedBySpecialtyID = "+a.getAcceptedBySpecialtyID();
-        return (processUpdate(sql)>0);
-    }
 
     @Override
-    public boolean updateAddress(Address a) {
-        String sql = "UPDATE Address "
-                  + "SET neighborhood = \'"+a.getNeighborhood()+"\', "
-                  + "city = \'"+a.getCity()+"\', "
-                  + "state = \'"+a.getState()+"\', "
-                  + "street = \'"+a.getStreet()+"\', "
-                  + "number = "+a.getNumber()+", "
-                  + "zipcode = ";
-        //Check if there is a zipcode
-        sql += (a.getZipcode()!=null) ?"\'"+a.getZipcode()+"\', " :"NULL, ";
-        
-        sql += "additionalInfo = ";
-        
-        //Check if there is addtional info
-        sql += (a.getAdditionalInfo()!=null) ?"\'"+a.getAdditionalInfo()+"\' " 
-                                             :"NULL ";
-        sql += "WHERE addressID = "+a.getAddressID();
-        return (processUpdate(sql)>0);
-    }
-    @Override
-    public boolean updateInsurance(Insurance i) {
-        String sql = "UPDATE Insurance "
-                   + "SET insuranceName = \'"+i.getInsuranceName()+"\' "
-                   + "WHERE insuranceID = "+i.getInsuranceID();
-        return (processUpdate(sql)>0);
-    }
-    
-    @Override
-    public boolean updatePatientMHub(PatientMHub p) {
-        String sql = "UPDATE PatientMHub "
-                   + "SET mhubID = \'"+p.getMhubID()+"\', "
-                   + "name = \'"+p.getName()+"\', "
-                   + "birth = \'"+p.getBirth()+"\' "
-                   + "WHERE patientMHubID = "+p.getPatientMHubID();
-        return (processUpdate(sql)>0);
-    }
-
-    @Override
-    public boolean updateSpecialty(Specialty s) {
-        String sql = "UPDATE Specialty "
-                   + "SET specialtyName = \'"+s.getSpecialtyname()+"\' "
-                   + "WHERE specialtyID = "+s.getSpecialtyID();
-        return (processUpdate(sql)>0);
-    }
-
-    @Override
-    public boolean updateVisit(Visit v) {
-        String sql = "UPDATE Visit "
-                   + "SET hospitalID = "+v.getHospitalID()+", "
-                   + "specialtyID = "+v.getSpecialtyID()+", "
-                   + "date = \'"+v.getDate()+"\', "
-                   + "hospitalScore = "+v.getHospitalScore()+", "
-                   + "specialityScore = "+v.getSpecialtyScore()+", "
-                   + "diagnostic = ";
-        //Check if there is a diagnostic
-        sql += (v.getDiagnostic()!=null) ?"\'"+v.getDiagnostic()+"\', "
-                                         :"NULL, ";
-        //Check if there is are reported symptoms
-        sql += "reportedSymptoms = ";
-        sql += (v.getReportedSymptoms()!=null) ?"\'"+v.getReportedSymptoms()+"\' "
-                                               :"NULL ";
-        sql += "WHERE visitID = "+v.getVisitID();
+    public boolean updateSection(Section s) {
+        String sql = "UPDATE Section "
+                   + "SET sectionName = \'"+s.getSectionName()+"\' "
+                   + "WHERE sectionID = "+s.getSectionID();
         return (processUpdate(sql)>0);
     }
 
@@ -475,36 +409,28 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         String sql = "SELECT * FROM Beacon";
         
         HashSet<String> columnName = new HashSet<>();
-        columnName.add("beaconID");
-        columnName.add("roomID");
         columnName.add("thingID");
         columnName.add("active");
-        columnName.add("lastBateryChange");
         
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
         
         for (Map<String, String> resulti : selectResult) {
-            Beacon b = new Beacon(Long.parseLong(resulti.get("beaconID")),
-                    Long.parseLong(resulti.get("roomID")),
-                    UUID.fromString(resulti.get("thingID")),
-                    ("1".equals(resulti.get("active"))),
-                    Date.valueOf(resulti.get("lastBateryChange")));
+            Beacon b = new Beacon(UUID.fromString(resulti.get("thingID")),
+                    ("1".equals(resulti.get("active"))));
             resultSet.add(b);
         }
         return resultSet;
     }
 
     @Override
-    public Set<Hospital> getHospitals() {
-        HashSet<Hospital> resultSet = new HashSet<>();
-        String sql = "SELECT * FROM Hospital";
+    public Set<Building> getBuildings() {
+        HashSet<Building> resultSet = new HashSet<>();
+        String sql = "SELECT * FROM Building";
 
         HashSet<String> columnName = new HashSet<>();
-        columnName.add("hospitalID");
-        columnName.add("hospitalName");
-        columnName.add("addressID");
-        columnName.add("latitude");
-        columnName.add("longitude");
+        columnName.add("buildinglID");
+        columnName.add("buildingName");
+        columnName.add("cityID");
 
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
 
@@ -520,7 +446,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
 
     @Override
-    public Set<Room> getRooms() {
+    public Set<City> getCities() {
         HashSet<Room> resultSet = new HashSet<>();
         String sql = "SELECT * FROM Room";
 
@@ -543,7 +469,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
 
     @Override
-    public Set<AcceptedBySpecialty> getAcceptedBySpecialties() {
+    public Set<Device> getDevices() {
         HashSet<AcceptedBySpecialty> resultSet = new HashSet<>();
         String sql = "SELECT * FROM AcceptedBySpecialty";
 
@@ -570,7 +496,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
 
     @Override
-    public Set<Address> getAddresses() {
+    public Set<HasA> getHasAs() {
         HashSet<Address> resultSet = new HashSet<>();
         String sql = "SELECT * FROM Address";
         
@@ -601,7 +527,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
     
     @Override
-    public Set<Insurance> getInsurances() {
+    public Set<MHub> getMHubs() {
         HashSet<Insurance> resultSet = new HashSet<>();
         String sql = "SELECT * FROM Insurance";
 
@@ -620,7 +546,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
 
     @Override
-    public Set<PatientMHub> getPatientMHubs() {
+    public Set<Person> getPersons() {
         HashSet<PatientMHub> resultSet = new HashSet<>();
         String sql = "SELECT * FROM PatientMHub";
 
@@ -643,7 +569,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
 
     @Override
-    public Set<Specialty> getSpecialties() {
+    public Set<Room> getRooms() {
         HashSet<Specialty> resultSet = new HashSet<>();
         String sql = "SELECT * FROM Specialty";
 
@@ -662,7 +588,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
 
     @Override
-    public Set<Visit> getVisits() {
+    public Set<Section> getSections() {
         HashSet<Visit> resultSet = new HashSet<>();
         String sql = "SELECT * FROM Visit";
 
@@ -693,7 +619,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         }
         return resultSet;
     }
-
+    /*
     @Override
     public Set<Hospital> getHospitalsByCity(String city) {
         HashSet<Hospital> resultSet = new HashSet<>();
@@ -986,7 +912,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                     resulti.get("additionalInfo"));
         }
         return a;
-    }
+    }*/
 }
 
 

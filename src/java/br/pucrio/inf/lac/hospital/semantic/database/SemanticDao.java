@@ -79,6 +79,41 @@ public interface SemanticDao {
      * Gets a Specific Set of Objects based on the parameters
      */
     /**
+     * Gets a specific Room
+     * @param room the name of the Room
+     * @return the Room
+     */
+    public Room getRoom(String room);
+    
+    /**
+     * Gets all the HasA (Devices+Persons) located at a specific room
+     * @param roomID the id of the Room
+     * @return A Set of HasA containing the Devices and Persons at the Room
+     */
+    public Set<HasA> getHasAByRoom(long roomID);
+    
+    /**
+     * Gets a specific Device
+     * @param deviceID the id of the Device
+     * @return the Device
+     */
+    public Device getDevice(long deviceID);
+    
+    /**
+     * Gets a specific Beacon
+     * @param thingID the id of the Beacon
+     * @return the Beacon
+     */
+    public Beacon getBeacon(UUID thingID);
+    
+    /**
+     * Gets a specific MHub
+     * @param mhubID the id of the MHub
+     * @return the MHub
+     */
+    public MHub getMHub(UUID mhubID);
+    
+    /**
      * Gets a specific Hospital
      * @param hospitalID the id of the Hospital
      * @return the Hospital

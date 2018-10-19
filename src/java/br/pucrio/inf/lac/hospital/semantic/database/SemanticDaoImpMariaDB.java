@@ -435,134 +435,114 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
 
         for (Map<String, String> resulti : selectResult) {
-            Hospital h = new Hospital(Long.parseLong(resulti.get("hospitalID")),
-                    resulti.get("hospitalName"),
-                    Long.parseLong(resulti.get("addressID")),
-                    Double.parseDouble(resulti.get("latitude")),
-                    Double.parseDouble(resulti.get("longitude")));
-            resultSet.add(h);
+            Building b = new Building(Long.parseLong(resulti.get("buildingID")),
+                    resulti.get("buildingName"),
+                    Long.parseLong(resulti.get("cityID")));
+            resultSet.add(b);
         }
         return resultSet;
     }
 
     @Override
     public Set<City> getCities() {
-        HashSet<Room> resultSet = new HashSet<>();
-        String sql = "SELECT * FROM Room";
+        HashSet<City> resultSet = new HashSet<>();
+        String sql = "SELECT * FROM City";
 
         HashSet<String> columnName = new HashSet<>();
-        columnName.add("roomID");
-        columnName.add("roomName");
-        columnName.add("roomType");
-        columnName.add("hospitalID");
+        columnName.add("cityID");
+        columnName.add("cityName");
 
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
 
         for (Map<String, String> resulti : selectResult) {
-            Room r = new Room(Long.parseLong(resulti.get("roomID")),
-                    resulti.get("roomName"),
-                    resulti.get("roomType"),
-                    Long.parseLong(resulti.get("hospitalID")));
-            resultSet.add(r);
+            City c = new City(Long.parseLong(resulti.get("cityID")),
+                    resulti.get("cityName"));
+            resultSet.add(c);
         }
         return resultSet;
     }
 
     @Override
     public Set<Device> getDevices() {
-        HashSet<AcceptedBySpecialty> resultSet = new HashSet<>();
-        String sql = "SELECT * FROM AcceptedBySpecialty";
+        HashSet<Device> resultSet = new HashSet<>();
+        String sql = "SELECT * FROM Device";
 
         HashSet<String> columnName = new HashSet<>();
-        columnName.add("acceptedBySpecialtyID");
-        columnName.add("hospitalID");
-        columnName.add("insuranceID");
-        columnName.add("specialtyID");
-        columnName.add("begin");
-        columnName.add("end");
+        columnName.add("deviceID");
+        columnName.add("manufacturer");
+        columnName.add("model");
+        columnName.add("mhubID");
+        columnName.add("thingID");
 
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
 
         for (Map<String, String> resulti : selectResult) {
-            AcceptedBySpecialty a = new AcceptedBySpecialty(Long.parseLong(resulti.get("acceptedBySpecialtyID")),
-                    Long.parseLong(resulti.get("hospitalID")),
-                    Long.parseLong(resulti.get("insuranceID")),
-                    Long.parseLong(resulti.get("specialtyID")),
-                    Date.valueOf(resulti.get("begin")),
-                    Date.valueOf(resulti.get("end")));
-            resultSet.add(a);
+            Device d = new Device(Long.parseLong(resulti.get("deviceID")),
+                    resulti.get("manufacturer"),
+                    resulti.get("model"),
+                    UUID.fromString(resulti.get("mhubID")),
+                    UUID.fromString(resulti.get("thingID")));
+            resultSet.add(d);
         }
         return resultSet;
     }
 
     @Override
     public Set<HasA> getHasAs() {
-        HashSet<Address> resultSet = new HashSet<>();
-        String sql = "SELECT * FROM Address";
+        HashSet<HasA> resultSet = new HashSet<>();
+        String sql = "SELECT * FROM HasA";
         
         HashSet<String> columnName = new HashSet<>();
-        columnName.add("addressID");
-        columnName.add("neighborhood");
-        columnName.add("city");
-        columnName.add("state");
-        columnName.add("street");
-        columnName.add("number");
-        columnName.add("zipcode");
-        columnName.add("additionalInfo");
+        columnName.add("hasAID");
+        columnName.add("deviceID");
+        columnName.add("personID");
+        columnName.add("roomID");
         
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
         
         for (Map<String, String> resulti : selectResult) {
-            Address a = new Address(Long.parseLong(resulti.get("addressID")),
-                    resulti.get("neighborhood"),
-                    resulti.get("city"),
-                    resulti.get("state"),
-                    resulti.get("street"),
-                    Integer.parseInt(resulti.get("number")),
-                    resulti.get("zipcode"),
-                    resulti.get("additionalInfo"));
-            resultSet.add(a);
+            HasA h = new HasA(Long.parseLong(resulti.get("hasAID")),
+                    Long.parseLong(resulti.get("deviceID")),
+                    Long.parseLong(resulti.get("personID")),
+                    Long.parseLong(resulti.get("roomID")));
+            resultSet.add(h);
         }
         return resultSet;
     }
     
     @Override
     public Set<MHub> getMHubs() {
-        HashSet<Insurance> resultSet = new HashSet<>();
-        String sql = "SELECT * FROM Insurance";
+        HashSet<MHub> resultSet = new HashSet<>();
+        String sql = "SELECT * FROM MHub";
 
         HashSet<String> columnName = new HashSet<>();
-        columnName.add("insuranceID");
-        columnName.add("insuranceName");
+        columnName.add("mhubID");
 
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
 
         for (Map<String, String> resulti : selectResult) {
-            Insurance i = new Insurance(Long.parseLong(resulti.get("insuranceID")),
-                    resulti.get("insuranceName"));
-            resultSet.add(i);
+            MHub m = new MHub(UUID.fromString(resulti.get("mhubID")));
+            resultSet.add(m);
         }
         return resultSet;
     }
 
     @Override
     public Set<Person> getPersons() {
-        HashSet<PatientMHub> resultSet = new HashSet<>();
-        String sql = "SELECT * FROM PatientMHub";
+        HashSet<Person> resultSet = new HashSet<>();
+        String sql = "SELECT * FROM Person";
 
         HashSet<String> columnName = new HashSet<>();
-        columnName.add("patientMHubID");
-        columnName.add("mhubID");
-        columnName.add("name");
-        columnName.add("birth");
+        columnName.add("personID");
+        columnName.add("personName");
+        columnName.add("personEmail");
 
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
 
         for (Map<String, String> resulti : selectResult) {
-            PatientMHub p = new PatientMHub(Long.parseLong(resulti.get("patientMHubID")),
-                    UUID.fromString(resulti.get("mhubID")),
-                    resulti.get("name"),
-                    Date.valueOf(resulti.get("birth")));
+            Person p = new Person(Long.parseLong(resulti.get("personID")),
+                    resulti.get("personName"),
+                    resulti.get("personEmail"));
             resultSet.add(p);
         }
         return resultSet;
@@ -570,55 +550,148 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
 
     @Override
     public Set<Room> getRooms() {
-        HashSet<Specialty> resultSet = new HashSet<>();
-        String sql = "SELECT * FROM Specialty";
+        HashSet<Room> resultSet = new HashSet<>();
+        String sql = "SELECT * FROM Room";
 
         HashSet<String> columnName = new HashSet<>();
-        columnName.add("specialtyID");
-        columnName.add("specialtyName");
+        columnName.add("roomID");
+        columnName.add("roomName");
+        columnName.add("sectionID");
 
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
 
         for (Map<String, String> resulti : selectResult) {
-            Specialty s = new Specialty(Long.parseLong(resulti.get("specialtyID")),
-                    resulti.get("specialtyName"));
-            resultSet.add(s);
+            Room r = new Room(Long.parseLong(resulti.get("roomID")),
+                    resulti.get("roomName"),
+                    Long.parseLong(resulti.get("sectionID")));
+            resultSet.add(r);
         }
         return resultSet;
     }
 
     @Override
     public Set<Section> getSections() {
-        HashSet<Visit> resultSet = new HashSet<>();
-        String sql = "SELECT * FROM Visit";
+        HashSet<Section> resultSet = new HashSet<>();
+        String sql = "SELECT * FROM Section";
 
         HashSet<String> columnName = new HashSet<>();
-        columnName.add("visitID");
-        columnName.add("patientMHubID");
-        columnName.add("hospitalID");
-        columnName.add("specialtyID");
-        columnName.add("date");
-        columnName.add("hospitalScore");
-        columnName.add("specialityScore");
-        columnName.add("diagnostic");
-        columnName.add("reportedSymptoms");
+        columnName.add("sectionID");
+        columnName.add("sectionName");
+        columnName.add("buildingID");
 
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
 
         for (Map<String, String> resulti : selectResult) {
-            Visit v = new Visit(Long.parseLong(resulti.get("visitID")),
-                    Long.parseLong(resulti.get("patientMHubID")),
-                    Long.parseLong(resulti.get("hospitalID")),
-                    Long.parseLong(resulti.get("specialtyID")),
-                    Date.valueOf(resulti.get("date")),
-                    Byte.parseByte(resulti.get("hospitalScore")),
-                    Byte.parseByte(resulti.get("specialityScore")),
-                    resulti.get("diagnostic"),
-                    resulti.get("reportedSymptoms"));
-            resultSet.add(v);
+            Section s = new Section(Long.parseLong(resulti.get("sectionID")),
+                    resulti.get("sectionName"),
+                    Long.parseLong(resulti.get("buildingID")));
+            resultSet.add(s);
         }
         return resultSet;
     }
+    
+    @Override
+    public Room getRoom(String room) {
+        String sql = "SELECT * FROM Room "
+                   + "WHERE roomName = "+room;
+
+        HashSet<String> columnName = new HashSet<>();
+        columnName.add("roomID");
+        columnName.add("roomName");
+        columnName.add("sectionID");
+
+        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
+        Room r = null;
+        for (Map<String, String> resulti : selectResult) {
+            r = new Room(Long.parseLong(resulti.get("roomID")),
+                    resulti.get("roomName"),
+                    Long.parseLong(resulti.get("sectionID")));
+        }
+        return r;
+    }
+    
+    @Override
+    public Set<HasA> getHasAByRoom(long roomID){
+        Set<HasA> resultSet = new HashSet<>();
+        String sql = "SELECT * FROM HasA "
+                   + "WHERE roomID = "+roomID;
+        HashSet<String> columnName = new HashSet<>();
+        columnName.add("hasAID");
+        columnName.add("deviceID");
+        columnName.add("personID");
+        columnName.add("roomID");
+        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
+        
+        //Add the beacons to the resultSet
+        for(Map<String, String> resulti : selectResult){
+            HasA h = new HasA(Long.parseLong(resulti.get("hasAID")),
+                                  Long.parseLong(resulti.get("deviceID")),
+                                  Long.parseLong(resulti.get("personID")),
+                                  roomID);
+            resultSet.add(h);
+        }
+        
+        return resultSet;
+    }
+    
+    @Override
+    public Device getDevice(long deviceID){
+        String sql = "SELECT * FROM Device "
+                   + "WHERE deviceID = "+deviceID;
+
+        HashSet<String> columnName = new HashSet<>();
+        columnName.add("deviceID");
+        columnName.add("manufacturer");
+        columnName.add("model");
+        columnName.add("mhubID");
+        columnName.add("thingID");
+
+        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
+        Device d = null;
+        for (Map<String, String> resulti : selectResult) {
+            d = new Device(Long.parseLong(resulti.get("deviceID")),
+                    resulti.get("manufacturer"),
+                    resulti.get("model"),
+                    UUID.fromString(resulti.get("mhubID")),
+                    UUID.fromString(resulti.get("thingID")));
+        }
+        return d;
+    }
+    
+    @Override
+    public Beacon getBeacon(UUID thingID){
+        String sql = "SELECT * FROM Beacon "
+                   + "WHERE thingID = "+thingID;
+
+        HashSet<String> columnName = new HashSet<>();
+        columnName.add("thingID");
+        columnName.add("active");
+
+        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
+        Beacon b = null;
+        for (Map<String, String> resulti : selectResult) {
+            b = new Beacon(UUID.fromString(resulti.get("thingID")),
+                    ("1".equals(resulti.get("active"))));
+        }
+        return b;
+    }
+    
+    @Override
+    public MHub getMHub(UUID mhubID){
+        String sql = "SELECT * FROM MHub "
+                   + "WHERE mhubID = "+mhubID;
+
+        HashSet<String> columnName = new HashSet<>();
+        columnName.add("mhubID");
+
+        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
+        MHub m = null;
+        for (Map<String, String> resulti : selectResult) {
+            m = new MHub(UUID.fromString(resulti.get("mhubID")));
+        }
+        return m;
+    }
+    
     /*
     @Override
     public Set<Hospital> getHospitalsByCity(String city) {

@@ -1,13 +1,15 @@
 package br.pucrio.inf.lac.hospital.semantic.wscore;
 
 import br.pucrio.inf.lac.hospital.horys.protocol.HORYSProtocol;
-import br.pucrio.inf.lac.hospital.semantic.data.AcceptedBySpecialty;
-import br.pucrio.inf.lac.hospital.semantic.data.Address;
 import br.pucrio.inf.lac.hospital.semantic.data.Beacon;
-import br.pucrio.inf.lac.hospital.semantic.data.Hospital;
-import br.pucrio.inf.lac.hospital.semantic.data.Insurance;
-import br.pucrio.inf.lac.hospital.semantic.data.Occupancy;
-import br.pucrio.inf.lac.hospital.semantic.data.Specialty;
+import br.pucrio.inf.lac.hospital.semantic.data.Building;
+import br.pucrio.inf.lac.hospital.semantic.data.City;
+import br.pucrio.inf.lac.hospital.semantic.data.Device;
+import br.pucrio.inf.lac.hospital.semantic.data.HasA;
+import br.pucrio.inf.lac.hospital.semantic.data.MHub;
+import br.pucrio.inf.lac.hospital.semantic.data.Person;
+import br.pucrio.inf.lac.hospital.semantic.data.Room;
+import br.pucrio.inf.lac.hospital.semantic.data.Section;
 import br.pucrio.inf.lac.hospital.semantic.database.SemanticDao;
 import br.pucrio.inf.lac.hospital.semantic.database.SemanticDaoImpMariaDB;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,12 +50,17 @@ public class SemanticResource {
     private ObjectMapper mapper;
     
     /** The  Horys restport. */
-    private final int HORYS_PORT = 30000;
+    private final String HORYS = "http://lsdi.ufma.br:7981";
+    /** The Service Mode: */
+    /** 0: Room has a beacon, Person has a mhub */
+    /** 1: Room has a mhub, Person has a beacon */
+    private final Integer MODE = 0;
 
     @Context
     private UriInfo context;
     
     //Compares two hospital by the nuber of patients at the moment
+    /*
     private Comparator<Hospital> hospitalComparator = new Comparator<Hospital>() {
         @Override
         public int compare(Hospital h1, Hospital h2){
@@ -75,7 +82,7 @@ public class SemanticResource {
             
             return patients1.compareTo(patients2);
         }
-    };
+    };*/
 
     /**
      * Creates a new instance of SemanticResource
@@ -94,25 +101,79 @@ public class SemanticResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String getJson() {
         return "{\n"
-                + "  \"name\" : \"Nome do Hopital\",\n"
-                + "  \"nPatientsNow\" : 50,\n"
-                + "  \"avgWaitTime\" : 180, //Em segundos\n"
-                + "  \"acceptedInsurances\" : [\"Plano1\", \"Plano2\"],\n"
-                + "  \"specialities\": [\"Clínico Geral\",\"Ortopedia\"],\n"
-                + "  \"lat\" : -22.981128,\n"
-                + "  \"long\" : -43.235839,\n"
-                + "  \"address\" : {\n"
-                + "    \"state\" : \"RJ\", //Pensei em apenas dois caracteres em Maiúsculo pra estados\n"
-                + "    \"city\" : \"Rio de Janeiro\",\n"
-                + "    \"neighborhood\" : \"Gávea\",\n"
-                + "    \"zipcode\" : \"22451-041\",\n"
-                + "    \"street\" : \"R. Marquês de São Vicente\",\n"
-                + "    \"number\" : 331,\n"
-                + "    \"AdditionalInfo\" : \"Quadra tal, Perto de ...\"\n"
-                + "  }\n"
+                + "  \"personID\" : 1,\n"
+                + "  \"personName\" : \"Daniel\",\n"
+                + "  \"personEmail\" : \"daniel@lsdi.ufma.br\",\n"
+                + "  \"mhubID\" : \"399eba78-2346-4c20-81ba-0a8cad5fdd22\",\n"
+                + "  \"thingID\": \"d4d70f9c-b5fa-4a47-8441-e90c8942f6ff\",\n"
+                + "  \"roomName\" : \"Sala das ETs\",\n"
+                + "  \"sectionName\" : \"LSDi\",\n"
+                + "  \"buildingName\" : \"Prédio da Pós\",\n"
+                + "  \"cityName\" : \"São Luís\",\n"
+                + "  \"duration\" : 3600, //Em segundos\n"
                 + "}";
     }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("person/byroom/{room}")
+    public String getPersonByRoom(@PathParam("room") String room) throws Exception {
 
+        Room r = dao.getRoom(room);
+        Set<HasA> hasASet = dao.getHasAByRoom(r.getRoomID());
+        Set<Device> deviceSet = new HashSet<>();
+        for (HasA h : hasASet) {
+            deviceSet.add(dao.getDevice(h.getDeviceID()));
+        }
+
+        String returnJson = "{ "
+                + "\"persons\": "
+                + "[";
+        Occupancy oc;
+        Map<String, Set<String>> insurancesAndSpecialties;
+        for (Device d : deviceSet) {
+            if(MODE == 0){
+                //oc = getDurationByThing(d.getThingID());  //duration/thing/{thingID}
+            }else if(MODE == 1){
+                //oc = getDurationByMHub(d.getMhubID());   //duration/mhub/{mhubID}
+            }
+            insurancesAndSpecialties = getInsurancesAndSpecialties(h);
+            returnJson += "\n{\"name\': \'" + h.getHospitalName() + "\', "
+                    //+ " \"nPatientsNow\": " + oc.getnPatientsNow() + ", "
+                    //+ "\"avgWaitTime\": " + oc.getAvgWaitTime() + ", "
+                    + "\"acceptedInsurances\": "
+                    + insurancesAndSpecialties.get("insurances") + ", "
+                    + "\"specialities\": "
+                    + insurancesAndSpecialties.get("specialties") + ", "
+                    + "\"lat\": " + h.getLatitude() + ", "
+                    + "\"long\": " + h.getLongitude() + ", "
+                    + "\"address\": {"
+                    + "\"state\": \"" + ad.getState() + "\", "
+                    + "\"city\": \"" + ad.getCity() + "\", "
+                    + "\"neighborhood\": \"" + ad.getNeighborhood() + "\", "
+                    + "\"zipcode\": ";
+
+            //Check if there is a zipcode
+            returnJson += (ad.getZipcode() != null)
+                    ? "\"" + ad.getZipcode() + "\", "
+                    : "null, ";
+
+            returnJson += "\"street\": " + ad.getStreet() + ", "
+                    + "\"number\": " + ad.getNumber() + ", "
+                    + "\"AdditionalInfo\": ";
+
+            //Check if there is Additional Info
+            returnJson += (ad.getAdditionalInfo() != null)
+                    ? "\"" + ad.getAdditionalInfo() + "\"}}, "
+                    : "null}}, ";
+        }
+        //Removes the last coma and space
+        returnJson = returnJson.substring(0, returnJson.length() - 2);
+        returnJson += "]}";
+        return returnJson;
+    }
+    
+    /*
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("hospital/bycity/{city}")
@@ -123,16 +184,16 @@ public class SemanticResource {
         String returnJson = "{ "
                 + "\"hospitals\": "
                 + "[";
-        Occupancy oc;
+        //Occupancy oc;
         Map<String, Set<String>> insurancesAndSpecialties;
         Address ad;
         for (Hospital h : hospitalSet) {
             ad = dao.getAddress(h.getAddressID());
-            oc = getHospitalOccupancy(h);
+            //oc = getHospitalOccupancy(h);
             insurancesAndSpecialties = getInsurancesAndSpecialties(h);
             returnJson += "\n{\"name\': \'" + h.getHospitalName() + "\', "
-                    + " \"nPatientsNow\": " + oc.getnPatientsNow() + ", "
-                    + "\"avgWaitTime\": " + oc.getAvgWaitTime() + ", "
+                    //+ " \"nPatientsNow\": " + oc.getnPatientsNow() + ", "
+                    //+ "\"avgWaitTime\": " + oc.getAvgWaitTime() + ", "
                     + "\"acceptedInsurances\": "
                     + insurancesAndSpecialties.get("insurances") + ", "
                     + "\"specialities\": "
@@ -173,7 +234,7 @@ public class SemanticResource {
         Hospital h = dao.getHospital(id);
 
         String returnJson;
-        Occupancy oc;
+        //Occupancy oc;
         Map<String, Set<String>> insurancesAndSpecialties;
         Address ad;
         ad = dao.getAddress(h.getAddressID());
@@ -496,7 +557,8 @@ public class SemanticResource {
         returnJson += "]}";
         return returnJson;
     }
-
+    */
+    /*
     private Occupancy getHospitalOccupancy(Hospital h) throws Exception {
         double avgDuration = 0.0;
         int nPatientsNow = 0;
@@ -513,7 +575,7 @@ public class SemanticResource {
         //Get info from Horiz
         for(Beacon b : beacons){
             //Get Average Duration
-            urlGetAvgDuration = "http://localhost:"+HORYS_PORT
+            urlGetAvgDuration = HORYS
                     + "/api/avgrendezvousduration/"+b.getThingID();
             returnedJson = sendGet(urlGetAvgDuration, "GET");
             hp = mapper.readValue(returnedJson, HORYSProtocol.class);
@@ -521,7 +583,7 @@ public class SemanticResource {
             avgDuration += (Double)parameters.get("average");
             
             //Get connectedMHubs
-            urlGetConnectedMHubs = "http://localhost:"+HORYS_PORT
+            urlGetConnectedMHubs = HORYS
                     + "/api/connectedmhubs/"+b.getThingID();
             returnedJson = sendGet(urlGetConnectedMHubs, "GET");
             hp = mapper.readValue(returnedJson, HORYSProtocol.class);
@@ -560,7 +622,7 @@ public class SemanticResource {
 
         return returnMap;
     }
-    
+    */
     // HTTP GET request
     private String sendGet(String url, String method) throws Exception {
 

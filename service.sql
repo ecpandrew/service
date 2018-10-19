@@ -22,8 +22,8 @@ USE `service` ;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `service`.`Person` (
   `personID` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NOT NULL,
-  `email` VARCHAR(45) NOT NULL,
+  `personName` VARCHAR(45) NOT NULL,
+  `personEmail` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`personID`))
 ENGINE = InnoDB;
 

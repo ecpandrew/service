@@ -620,6 +620,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         columnName.add("deviceID");
         columnName.add("personID");
         columnName.add("roomID");
+        
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
         
         //Add the beacons to the resultSet
@@ -635,9 +636,79 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
     
     @Override
+    public HasA getHasAByDevice(long deviceID){
+        String sql = "SELECT * FROM HasA "
+                   + "WHERE deviceID = "+deviceID;
+
+        HashSet<String> columnName = new HashSet<>();
+        columnName.add("hasAID");
+        columnName.add("deviceID");
+        columnName.add("personID");
+        columnName.add("roomID");
+
+        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
+        HasA h = null;
+        for (Map<String, String> resulti : selectResult) {
+            h = new HasA(Long.parseLong(resulti.get("hasAID")),
+                    deviceID,
+                    Long.parseLong(resulti.get("personID")),
+                    Long.parseLong(resulti.get("roomID")));
+        }
+        return h;
+    }
+    
+    @Override
     public Device getDevice(long deviceID){
         String sql = "SELECT * FROM Device "
                    + "WHERE deviceID = "+deviceID;
+
+        HashSet<String> columnName = new HashSet<>();
+        columnName.add("deviceID");
+        columnName.add("manufacturer");
+        columnName.add("model");
+        columnName.add("mhubID");
+        columnName.add("thingID");
+
+        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
+        Device d = null;
+        for (Map<String, String> resulti : selectResult) {
+            d = new Device(Long.parseLong(resulti.get("deviceID")),
+                    resulti.get("manufacturer"),
+                    resulti.get("model"),
+                    UUID.fromString(resulti.get("mhubID")),
+                    UUID.fromString(resulti.get("thingID")));
+        }
+        return d;
+    }
+    
+    @Override
+    public Device getDeviceByMHub(UUID mhubID){
+        String sql = "SELECT * FROM Device "
+                   + "WHERE mhubID = "+mhubID;
+
+        HashSet<String> columnName = new HashSet<>();
+        columnName.add("deviceID");
+        columnName.add("manufacturer");
+        columnName.add("model");
+        columnName.add("mhubID");
+        columnName.add("thingID");
+
+        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
+        Device d = null;
+        for (Map<String, String> resulti : selectResult) {
+            d = new Device(Long.parseLong(resulti.get("deviceID")),
+                    resulti.get("manufacturer"),
+                    resulti.get("model"),
+                    UUID.fromString(resulti.get("mhubID")),
+                    UUID.fromString(resulti.get("thingID")));
+        }
+        return d;
+    }
+    
+    @Override
+    public Device getDeviceByThing(UUID thingID){
+        String sql = "SELECT * FROM Device "
+                   + "WHERE thingID = "+thingID;
 
         HashSet<String> columnName = new HashSet<>();
         columnName.add("deviceID");
@@ -690,6 +761,26 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
             m = new MHub(UUID.fromString(resulti.get("mhubID")));
         }
         return m;
+    }
+    
+    @Override
+    public Person getPerson(long personID){
+        String sql = "SELECT * FROM Person "
+                   + "WHERE personID = "+personID;
+
+        HashSet<String> columnName = new HashSet<>();
+        columnName.add("personID");
+        columnName.add("personName");
+        columnName.add("personEmail");
+
+        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
+        Person p = null;
+        for (Map<String, String> resulti : selectResult) {
+            p = new Person(Long.parseLong(resulti.get("personID")),
+                    resulti.get("personName"),
+                    resulti.get("personEmail"));
+        }
+        return p;
     }
     
     /*

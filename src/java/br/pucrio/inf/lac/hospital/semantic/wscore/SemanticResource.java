@@ -8,6 +8,7 @@ import br.pucrio.inf.lac.hospital.semantic.data.Device;
 import br.pucrio.inf.lac.hospital.semantic.data.HasA;
 import br.pucrio.inf.lac.hospital.semantic.data.MHub;
 import br.pucrio.inf.lac.hospital.semantic.data.Person;
+import br.pucrio.inf.lac.hospital.semantic.data.Rendezvous;
 import br.pucrio.inf.lac.hospital.semantic.data.Room;
 import br.pucrio.inf.lac.hospital.semantic.data.Section;
 import br.pucrio.inf.lac.hospital.semantic.database.SemanticDao;
@@ -129,43 +130,33 @@ public class SemanticResource {
         String returnJson = "{ "
                 + "\"persons\": "
                 + "[";
-        Occupancy oc;
-        Map<String, Set<String>> insurancesAndSpecialties;
+        Set<Rendezvous> rendezvousSet = null;
         for (Device d : deviceSet) {
             if(MODE == 0){
-                //oc = getDurationByThing(d.getThingID());  //duration/thing/{thingID}
+                rendezvousSet = getDurationByThing(d.getThingID());  //duration/thing/{thingID}
             }else if(MODE == 1){
-                //oc = getDurationByMHub(d.getMhubID());   //duration/mhub/{mhubID}
+                rendezvousSet = getDurationByMHub(d.getMhubID());   //duration/mhub/{mhubID}
             }
-            insurancesAndSpecialties = getInsurancesAndSpecialties(h);
-            returnJson += "\n{\"name\': \'" + h.getHospitalName() + "\', "
-                    //+ " \"nPatientsNow\": " + oc.getnPatientsNow() + ", "
-                    //+ "\"avgWaitTime\": " + oc.getAvgWaitTime() + ", "
-                    + "\"acceptedInsurances\": "
-                    + insurancesAndSpecialties.get("insurances") + ", "
-                    + "\"specialities\": "
-                    + insurancesAndSpecialties.get("specialties") + ", "
-                    + "\"lat\": " + h.getLatitude() + ", "
-                    + "\"long\": " + h.getLongitude() + ", "
-                    + "\"address\": {"
-                    + "\"state\": \"" + ad.getState() + "\", "
-                    + "\"city\": \"" + ad.getCity() + "\", "
-                    + "\"neighborhood\": \"" + ad.getNeighborhood() + "\", "
-                    + "\"zipcode\": ";
-
-            //Check if there is a zipcode
-            returnJson += (ad.getZipcode() != null)
-                    ? "\"" + ad.getZipcode() + "\", "
-                    : "null, ";
-
-            returnJson += "\"street\": " + ad.getStreet() + ", "
-                    + "\"number\": " + ad.getNumber() + ", "
-                    + "\"AdditionalInfo\": ";
-
-            //Check if there is Additional Info
-            returnJson += (ad.getAdditionalInfo() != null)
-                    ? "\"" + ad.getAdditionalInfo() + "\"}}, "
-                    : "null}}, ";
+            for (Rendezvous re: rendezvousSet) {
+                Device d2 = null;
+                if(MODE == 0){
+                    d2 = dao.getDeviceByMHub(re.getMhubID());
+                }else if(MODE == 1){
+                    d2 = dao.getDeviceByThing(re.getThingID());
+                }
+                HasA h = dao.getHasAByDevice(d2.getDeviceID());
+                Person p = dao.getPerson(h.getPersonID());
+                returnJson += "\n{\"name\': \'" + p.getPersonName() + "\', "
+                        + "\"email\": " + p.getPersonEmail() + ", ";
+                
+                if(MODE == 0){
+                    returnJson += "\"mhubID\": " + re.getMhubID() + ", ";
+                }else if(MODE == 1){
+                    returnJson += "\"thingID\": " + re.getThingID() + ", ";
+                }
+                
+                returnJson += "\"duration\": " + re.getDuration() + "}, ";
+            }
         }
         //Removes the last coma and space
         returnJson = returnJson.substring(0, returnJson.length() - 2);
@@ -558,48 +549,72 @@ public class SemanticResource {
         return returnJson;
     }
     */
-    /*
-    private Occupancy getHospitalOccupancy(Hospital h) throws Exception {
-        double avgDuration = 0.0;
-        int nPatientsNow = 0;
-        String urlGetAvgDuration;
-        String urlGetConnectedMHubs;
+    // duration/thing/{thingID}
+    private Set<Rendezvous> getDurationByThing(UUID thingID) throws Exception {
+        UUID mhubID = null;
+        long duration = 0;
+        String url;
         String returnedJson;
         HORYSProtocol hp;
         Map<String, Object> parameters;
         ArrayList<UUID> connectedMHubs;
-        
-        //Get the beacons in the Hospital
-        Set<Beacon> beacons = dao.getBeaconsByHospital(h.getHospitalID());
-        
-        //Get info from Horiz
-        for(Beacon b : beacons){
-            //Get Average Duration
-            urlGetAvgDuration = HORYS
-                    + "/api/avgrendezvousduration/"+b.getThingID();
-            returnedJson = sendGet(urlGetAvgDuration, "GET");
-            hp = mapper.readValue(returnedJson, HORYSProtocol.class);
-            parameters = hp.getParameters();
-            avgDuration += (Double)parameters.get("average");
-            
-            //Get connectedMHubs
-            urlGetConnectedMHubs = HORYS
-                    + "/api/connectedmhubs/"+b.getThingID();
-            returnedJson = sendGet(urlGetConnectedMHubs, "GET");
-            hp = mapper.readValue(returnedJson, HORYSProtocol.class);
-            parameters = hp.getParameters();
-            connectedMHubs = (ArrayList<UUID>)parameters.get("response");
-            nPatientsNow += connectedMHubs.size();
-        }
-        
-        if(beacons.size()>0)
-            avgDuration = avgDuration / beacons.size();
-        
-        Occupancy oc = new Occupancy(nPatientsNow, avgDuration);
+        /*
+        //Get Average Duration
+        url = HORYS
+                + "/api/avgrendezvousduration/"+thingID;
+        returnedJson = sendGet(url, "GET");
+        hp = mapper.readValue(returnedJson, HORYSProtocol.class);
+        parameters = hp.getParameters();
+        avgDuration += (Double)parameters.get("average");
 
-        return oc;
+        //Get connectedMHubs
+        url = HORYS
+                + "/api/connectedmhubs/"+thingID;
+        returnedJson = sendGet(url, "GET");
+        hp = mapper.readValue(returnedJson, HORYSProtocol.class);
+        parameters = hp.getParameters();
+        connectedMHubs = (ArrayList<UUID>)parameters.get("response");
+        nPatientsNow += connectedMHubs.size();
+        */
+        Set<Rendezvous> rendezvousSet = new HashSet<>();
+        rendezvousSet.add(new Rendezvous(mhubID, thingID, duration));
+
+        return rendezvousSet;
     }
+    
+    // duration/mhub/{mhubID}
+    private Set<Rendezvous> getDurationByMHub(UUID mhubID) throws Exception {
+        UUID thingID = null;
+        long duration = 0;
+        String url;
+        String returnedJson;
+        HORYSProtocol hp;
+        Map<String, Object> parameters;
+        ArrayList<UUID> connectedMHubs;
+        /*
+        //Get Average Duration
+        url = HORYS
+                + "/api/avgrendezvousduration/"+mhubID;
+        returnedJson = sendGet(url, "GET");
+        hp = mapper.readValue(returnedJson, HORYSProtocol.class);
+        parameters = hp.getParameters();
+        avgDuration += (Double)parameters.get("average");
 
+        //Get connectedMHubs
+        url = HORYS
+                + "/api/connectedmhubs/"+thingID;
+        returnedJson = sendGet(url, "GET");
+        hp = mapper.readValue(returnedJson, HORYSProtocol.class);
+        parameters = hp.getParameters();
+        connectedMHubs = (ArrayList<UUID>)parameters.get("response");
+        nPatientsNow += connectedMHubs.size();
+        */
+        Set<Rendezvous> rendezvousSet = new HashSet<>();
+        rendezvousSet.add(new Rendezvous(mhubID, thingID, duration));
+
+        return rendezvousSet;
+    }
+    /*
     private Map<String, Set<String>> getInsurancesAndSpecialties(Hospital h) {
         Map<String, Set<String>> returnMap = new HashMap<>();
 

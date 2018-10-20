@@ -86,11 +86,18 @@ public interface SemanticDao {
     public Room getRoom(String room);
     
     /**
-     * Gets all the HasA (Devices+Persons) located at a specific room
+     * Gets all the HasA (Devices+Persons+Rooms) located at a specific Room
      * @param roomID the id of the Room
-     * @return A Set of HasA containing the Devices and Persons at the Room
+     * @return A Set of HasA containing the Devices, Persons and Rooms
      */
     public Set<HasA> getHasAByRoom(long roomID);
+    
+    /**
+     * Gets a specific HasA (Devices+Persons+Rooms) with a specific Device
+     * @param deviceID the id of the Device
+     * @return the HasA containing the Devices, Persons and Rooms
+     */
+    public HasA getHasAByDevice(long deviceID);
     
     /**
      * Gets a specific Device
@@ -98,6 +105,20 @@ public interface SemanticDao {
      * @return the Device
      */
     public Device getDevice(long deviceID);
+    
+    /**
+     * Gets a specific Device
+     * @param mhubID the id of the MHub
+     * @return the Device
+     */
+    public Device getDeviceByMHub(UUID mhubID);
+    
+    /**
+     * Gets a specific Device
+     * @param thingID the id of the MHub
+     * @return the Device
+     */
+    public Device getDeviceByThing(UUID thingID);
     
     /**
      * Gets a specific Beacon
@@ -112,6 +133,13 @@ public interface SemanticDao {
      * @return the MHub
      */
     public MHub getMHub(UUID mhubID);
+    
+    /**
+     * Gets a specific Person
+     * @param personID the id of the Person
+     * @return the Person
+     */
+    public Person getPerson(long personID);
     
     /**
      * Gets a specific Hospital

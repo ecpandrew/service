@@ -100,7 +100,7 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `service`.`Mhub`
+-- Table `service`.`MHub`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `service`.`MHub` (
   `mhubID` VARCHAR(45) NOT NULL,
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS `service`.`Device` (
   INDEX `fk_Device_Beacon1_idx` (`thingID` ASC) ,
   CONSTRAINT `fk_Device_Mhub1`
     FOREIGN KEY (`mhubID`)
-    REFERENCES `service`.`Mhub` (`mhubID`)
+    REFERENCES `service`.`MHub` (`mhubID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Device_Beacon1`

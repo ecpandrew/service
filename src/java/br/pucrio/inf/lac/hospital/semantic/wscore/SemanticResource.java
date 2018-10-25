@@ -117,9 +117,8 @@ public class SemanticResource {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("person/byroom/{room}")
+    @Path("person/byroom/{room}/")
     public String getPersonByRoom(@PathParam("room") String room) throws Exception {
-
         Room r = dao.getRoom(room);
         Set<HasA> hasASet = dao.getHasAByRoom(r.getRoomID());
         Set<Device> deviceSet = new HashSet<>();

@@ -33,7 +33,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
     
     public void connectToDB(){
-        String url = "jdbc:mariadb://localhost/h4";
+        String url = "jdbc:mariadb://localhost/service";
         Properties props = new Properties();
         props.setProperty("user","semantic");
         props.setProperty("password","semantic");
@@ -593,7 +593,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     @Override
     public Room getRoom(String room) {
         String sql = "SELECT * FROM Room "
-                   + "WHERE roomName = "+room;
+                   + "WHERE roomName = \'"+room+"\'";
 
         HashSet<String> columnName = new HashSet<>();
         columnName.add("roomID");

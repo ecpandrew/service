@@ -253,8 +253,8 @@ COMMIT;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `service`;
-INSERT INTO `service`.`HasA` (`hasAID`, `deviceID`, `personID`, `roomID`) VALUES (1, 1, 1, NULL);
-INSERT INTO `service`.`HasA` (`hasAID`, `deviceID`, `personID`, `roomID`) VALUES (2, 2, NULL, 1);
+INSERT INTO `service`.`HasA` (`hasAID`, `deviceID`, `personID`, `roomID`) VALUES (1, 1, NULL, 1);
+INSERT INTO `service`.`HasA` (`hasAID`, `deviceID`, `personID`, `roomID`) VALUES (2, 2, 1, NULL);
 
 COMMIT;
 

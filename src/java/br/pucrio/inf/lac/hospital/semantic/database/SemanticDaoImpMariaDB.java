@@ -115,8 +115,13 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()){
                 HashMap<String, String> columnMap = new HashMap<>();
-                for(String columnNamei : columnName)
-                    columnMap.put(columnNamei, rs.getString(columnNamei));
+                for(String columnNamei : columnName){
+                    String s = rs.getString(columnNamei);
+                    if (rs.wasNull()) {
+                        s = "";
+                    }
+                    columnMap.put(columnNamei, s);
+                }
                 result.add(columnMap);
             }
             rs.close();
@@ -625,9 +630,10 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         
         //Add the beacons to the resultSet
         for(Map<String, String> resulti : selectResult){
+            //if(resulti.get("personID").isEmpty())
             HasA h = new HasA(Long.parseLong(resulti.get("hasAID")),
-                                  Long.parseLong(resulti.get("deviceID")),
-                                  Long.parseLong(resulti.get("personID")),
+                                  resulti.get("deviceID").isEmpty()?0:Long.parseLong(resulti.get("deviceID")),
+                                  resulti.get("personID").isEmpty()?0:Long.parseLong(resulti.get("personID")),
                                   roomID);
             resultSet.add(h);
         }
@@ -651,8 +657,8 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         for (Map<String, String> resulti : selectResult) {
             h = new HasA(Long.parseLong(resulti.get("hasAID")),
                     deviceID,
-                    Long.parseLong(resulti.get("personID")),
-                    Long.parseLong(resulti.get("roomID")));
+                    resulti.get("deviceID").isEmpty()?0:Long.parseLong(resulti.get("personID")),
+                    resulti.get("roomID").isEmpty()?0:Long.parseLong(resulti.get("roomID")));
         }
         return h;
     }
@@ -675,8 +681,8 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
             d = new Device(Long.parseLong(resulti.get("deviceID")),
                     resulti.get("manufacturer"),
                     resulti.get("model"),
-                    UUID.fromString(resulti.get("mhubID")),
-                    UUID.fromString(resulti.get("thingID")));
+                    resulti.get("mhubID").isEmpty()?null:UUID.fromString(resulti.get("mhubID")),
+                    resulti.get("thingID").isEmpty()?null:UUID.fromString(resulti.get("thingID")));
         }
         return d;
     }
@@ -684,7 +690,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     @Override
     public Device getDeviceByMHub(UUID mhubID){
         String sql = "SELECT * FROM Device "
-                   + "WHERE mhubID = "+mhubID;
+                   + "WHERE mhubID = \'"+mhubID+"\'";
 
         HashSet<String> columnName = new HashSet<>();
         columnName.add("deviceID");
@@ -699,8 +705,8 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
             d = new Device(Long.parseLong(resulti.get("deviceID")),
                     resulti.get("manufacturer"),
                     resulti.get("model"),
-                    UUID.fromString(resulti.get("mhubID")),
-                    UUID.fromString(resulti.get("thingID")));
+                    resulti.get("mhubID").isEmpty()?null:UUID.fromString(resulti.get("mhubID")),
+                    resulti.get("thingID").isEmpty()?null:UUID.fromString(resulti.get("thingID")));
         }
         return d;
     }
@@ -708,7 +714,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     @Override
     public Device getDeviceByThing(UUID thingID){
         String sql = "SELECT * FROM Device "
-                   + "WHERE thingID = "+thingID;
+                   + "WHERE thingID = \'"+thingID+"\'";
 
         HashSet<String> columnName = new HashSet<>();
         columnName.add("deviceID");
@@ -723,8 +729,8 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
             d = new Device(Long.parseLong(resulti.get("deviceID")),
                     resulti.get("manufacturer"),
                     resulti.get("model"),
-                    UUID.fromString(resulti.get("mhubID")),
-                    UUID.fromString(resulti.get("thingID")));
+                    resulti.get("mhubID").isEmpty()?null:UUID.fromString(resulti.get("mhubID")),
+                    resulti.get("thingID").isEmpty()?null:UUID.fromString(resulti.get("thingID")));
         }
         return d;
     }
@@ -732,7 +738,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     @Override
     public Beacon getBeacon(UUID thingID){
         String sql = "SELECT * FROM Beacon "
-                   + "WHERE thingID = "+thingID;
+                   + "WHERE thingID = \'"+thingID+"\'";
 
         HashSet<String> columnName = new HashSet<>();
         columnName.add("thingID");
@@ -750,7 +756,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     @Override
     public MHub getMHub(UUID mhubID){
         String sql = "SELECT * FROM MHub "
-                   + "WHERE mhubID = "+mhubID;
+                   + "WHERE mhubID = \'"+mhubID+"\'";
 
         HashSet<String> columnName = new HashSet<>();
         columnName.add("mhubID");

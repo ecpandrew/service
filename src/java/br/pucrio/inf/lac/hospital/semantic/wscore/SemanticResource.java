@@ -14,6 +14,8 @@ import br.pucrio.inf.lac.hospital.semantic.data.Section;
 import br.pucrio.inf.lac.hospital.semantic.database.SemanticDao;
 import br.pucrio.inf.lac.hospital.semantic.database.SemanticDaoImpMariaDB;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -145,7 +147,7 @@ public class SemanticResource {
                 }
                 HasA h = dao.getHasAByDevice(d2.getDeviceID());
                 Person p = dao.getPerson(h.getPersonID());
-                returnJson += "\n{\"name\': \'" + p.getPersonName() + "\', "
+                returnJson += "{\"name\': \'" + p.getPersonName() + "\', "
                         + "\"email\": " + p.getPersonEmail() + ", ";
                 
                 if(MODE == 0){
@@ -159,7 +161,7 @@ public class SemanticResource {
         }
         //Removes the last coma and space
         returnJson = returnJson.substring(0, returnJson.length() - 2);
-        returnJson += "]}";
+        returnJson += "]}\n";
         return returnJson;
     }
     
@@ -557,25 +559,18 @@ public class SemanticResource {
         HORYSProtocol hp;
         Map<String, Object> parameters;
         ArrayList<UUID> connectedMHubs;
-        /*
+        
         //Get Average Duration
         url = HORYS
-                + "/api/avgrendezvousduration/"+thingID;
+                + "/api/duration/thing/"+thingID;
         returnedJson = sendGet(url, "GET");
-        hp = mapper.readValue(returnedJson, HORYSProtocol.class);
-        parameters = hp.getParameters();
-        avgDuration += (Double)parameters.get("average");
+        
+        JSONArray data = new JSONArray(returnedJson);
+        JSONObject text = data.getJSONObject(0);
 
-        //Get connectedMHubs
-        url = HORYS
-                + "/api/connectedmhubs/"+thingID;
-        returnedJson = sendGet(url, "GET");
-        hp = mapper.readValue(returnedJson, HORYSProtocol.class);
-        parameters = hp.getParameters();
-        connectedMHubs = (ArrayList<UUID>)parameters.get("response");
-        nPatientsNow += connectedMHubs.size();
-        */
         Set<Rendezvous> rendezvousSet = new HashSet<>();
+        mhubID = UUID.fromString(text.getString("mhubID"));
+        duration = text.getLong("duration");
         rendezvousSet.add(new Rendezvous(mhubID, thingID, duration));
 
         return rendezvousSet;

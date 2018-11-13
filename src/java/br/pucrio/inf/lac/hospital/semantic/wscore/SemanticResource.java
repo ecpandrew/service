@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -40,6 +41,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.PathSegment;
 
 /**
  * REST Web Service
@@ -54,6 +56,7 @@ public class SemanticResource {
     
     /** The  Horys restport. */
     private final String HORYS = "http://lsdi.ufma.br:7981";
+    private final String sHORYS = "http://localhost:8080/service/webresources/simulatedhoriz";
     /** The Service Mode: */
     /** 0: Room has a beacon, Person has a mhub */
     /** 1: Room has a mhub, Person has a beacon */
@@ -122,6 +125,7 @@ public class SemanticResource {
     @Path("person/byroom/{room}/")
     public String getPersonByRoom(@PathParam("room") String room) throws Exception {
         Room r = dao.getRoom(room);
+        if(r == null) return "{}";
         Set<HasA> hasASet = dao.getHasAByRoom(r.getRoomID());
         Set<Device> deviceSet = new HashSet<>();
         for (HasA h : hasASet) {
@@ -138,6 +142,7 @@ public class SemanticResource {
             }else if(MODE == 1){
                 rendezvousSet = getDurationByMHub(d.getMhubID());   //duration/mhub/{mhubID}
             }
+            if(rendezvousSet == null) return "{}";
             for (Rendezvous re: rendezvousSet) {
                 Device d2 = null;
                 if(MODE == 0){
@@ -147,13 +152,13 @@ public class SemanticResource {
                 }
                 HasA h = dao.getHasAByDevice(d2.getDeviceID());
                 Person p = dao.getPerson(h.getPersonID());
-                returnJson += "{\"name\': \'" + p.getPersonName() + "\', "
-                        + "\"email\": " + p.getPersonEmail() + ", ";
+                returnJson += "{\"name\': \"" + p.getPersonName() + "\", "
+                        + "\"email\": \"" + p.getPersonEmail() + "\", ";
                 
                 if(MODE == 0){
-                    returnJson += "\"mhubID\": " + re.getMhubID() + ", ";
+                    returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
                 }else if(MODE == 1){
-                    returnJson += "\"thingID\": " + re.getThingID() + ", ";
+                    returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
                 }
                 
                 returnJson += "\"duration\": " + re.getDuration() + "}, ";
@@ -165,400 +170,119 @@ public class SemanticResource {
         return returnJson;
     }
     
-    /*
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("hospital/bycity/{city}")
-    public String getHospitalByCity(@PathParam("city") String city) throws Exception {
-
-        Set<Hospital> hospitalSet = dao.getHospitalsByCity(city);
+    @Path("person/byroomandtime/{room}/{Q}/{W}/")
+    public String getPersonByRoomAndTime(@PathParam("room") String room, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
+        Room r = dao.getRoom(room);
+        if(r == null) return "{}";
+        Set<HasA> hasASet = dao.getHasAByRoom(r.getRoomID());
+        Set<Device> deviceSet = new HashSet<>();
+        for (HasA h : hasASet) {
+            deviceSet.add(dao.getDevice(h.getDeviceID()));
+        }
 
         String returnJson = "{ "
-                + "\"hospitals\": "
+                + "\"persons\": "
                 + "[";
-        //Occupancy oc;
-        Map<String, Set<String>> insurancesAndSpecialties;
-        Address ad;
-        for (Hospital h : hospitalSet) {
-            ad = dao.getAddress(h.getAddressID());
-            //oc = getHospitalOccupancy(h);
-            insurancesAndSpecialties = getInsurancesAndSpecialties(h);
-            returnJson += "\n{\"name\': \'" + h.getHospitalName() + "\', "
-                    //+ " \"nPatientsNow\": " + oc.getnPatientsNow() + ", "
-                    //+ "\"avgWaitTime\": " + oc.getAvgWaitTime() + ", "
-                    + "\"acceptedInsurances\": "
-                    + insurancesAndSpecialties.get("insurances") + ", "
-                    + "\"specialities\": "
-                    + insurancesAndSpecialties.get("specialties") + ", "
-                    + "\"lat\": " + h.getLatitude() + ", "
-                    + "\"long\": " + h.getLongitude() + ", "
-                    + "\"address\": {"
-                    + "\"state\": \"" + ad.getState() + "\", "
-                    + "\"city\": \"" + ad.getCity() + "\", "
-                    + "\"neighborhood\": \"" + ad.getNeighborhood() + "\", "
-                    + "\"zipcode\": ";
-
-            //Check if there is a zipcode
-            returnJson += (ad.getZipcode() != null)
-                    ? "\"" + ad.getZipcode() + "\", "
-                    : "null, ";
-
-            returnJson += "\"street\": " + ad.getStreet() + ", "
-                    + "\"number\": " + ad.getNumber() + ", "
-                    + "\"AdditionalInfo\": ";
-
-            //Check if there is Additional Info
-            returnJson += (ad.getAdditionalInfo() != null)
-                    ? "\"" + ad.getAdditionalInfo() + "\"}}, "
-                    : "null}}, ";
+        Set<Rendezvous> rendezvousSet = null;
+        for (Device d : deviceSet) {
+            if(MODE == 0){
+                rendezvousSet = getRendezvousByThingAndTime(d.getThingID(), Q, W);  //rendezvous/thingandtime/{thingID}/{Q}/{W}
+            }else if(MODE == 1){
+                rendezvousSet = getRendezvousByMHubAndTime(d.getMhubID(), Q, W);   //duration/mhubandtime/{mhubID}/{Q}/{W}
+            }
+            if(rendezvousSet == null) return "{}";
+            for (Rendezvous re: rendezvousSet) {
+                Device d2 = null;
+                if(MODE == 0){
+                    d2 = dao.getDeviceByMHub(re.getMhubID());
+                }else if(MODE == 1){
+                    d2 = dao.getDeviceByThing(re.getThingID());
+                }
+                HasA h = dao.getHasAByDevice(d2.getDeviceID());
+                Person p = dao.getPerson(h.getPersonID());
+                returnJson += "{\"name\': \"" + p.getPersonName() + "\", "
+                        + "\"email\": \"" + p.getPersonEmail() + "\", ";
+                
+                if(MODE == 0){
+                    returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
+                }else if(MODE == 1){
+                    returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
+                }
+                
+                returnJson += "\"start\": " + re.getStart() + ", ";
+                returnJson += "\"end\": " + re.getEnd() + "}, ";
+            }
         }
         //Removes the last coma and space
         returnJson = returnJson.substring(0, returnJson.length() - 2);
-        returnJson += "]}";
-        return returnJson;
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("hospital/byid/{id}")
-    public String getHospitalByID(@PathParam("id") long id) throws Exception {
-
-        Hospital h = dao.getHospital(id);
-
-        String returnJson;
-        //Occupancy oc;
-        Map<String, Set<String>> insurancesAndSpecialties;
-        Address ad;
-        ad = dao.getAddress(h.getAddressID());
-        //oc = getHospitalOccupancy(h);
-        insurancesAndSpecialties = getInsurancesAndSpecialties(h);
-        returnJson = "{\"name\': \'" + h.getHospitalName() + "\', "
-                //+ " \"nPatientsNow\": " + oc.getnPatientsNow() + ", "
-                //+ "\"avgWaitTime\": " + oc.getAvgWaitTime() + ", "
-                + "\"acceptedInsurances\": "
-                + insurancesAndSpecialties.get("insurances") + ", "
-                + "\"specialities\": "
-                + insurancesAndSpecialties.get("specialties") + ", "
-                + "\"lat\": " + h.getLatitude() + ", "
-                + "\"long\": " + h.getLongitude() + ", "
-                + "\"address\": {"
-                + "\"state\": \"" + ad.getState() + "\", "
-                + "\"city\": \"" + ad.getCity() + "\", "
-                + "\"neighborhood\": \"" + ad.getNeighborhood() + "\", "
-                + "\"zipcode\": ";
-
-        //Check if there is a zipcode
-        returnJson += (ad.getZipcode() != null)
-                ? "\"" + ad.getZipcode() + "\", "
-                : "null, ";
-
-        returnJson += "\"street\": " + ad.getStreet() + ", "
-                + "\"number\": " + ad.getNumber() + ", "
-                + "\"AdditionalInfo\": ";
-
-        //Check if there is Additional Info
-        returnJson += (ad.getAdditionalInfo() != null)
-                ? "\"" + ad.getAdditionalInfo() + "\"}}, "
-                : "null}}";
-
+        returnJson += "]}\n";
         return returnJson;
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("hospital/byspecialtyandcity/{specialtyID}/{city}")
-    public String getHospitalBySpeciatyAndCity(@PathParam("specialtyID") long sID, @PathParam("city") String city) throws Exception {
-
-        Set<Hospital> hospitalSet = dao.getHospitalsByCityAndSpecialty(city, sID);
+    @Path("person/rendezvous/{Q}/{W}/{emails: .*}/")
+    public String getPersonRendezvous(@PathParam("Q") long Q, @PathParam("W") long W, @PathParam("emails") List<PathSegment> emails) throws Exception {
+        boolean flag = false;
+        Set<Person> personSet = new HashSet<>();
+        for (PathSegment email: emails) {
+            personSet.add(dao.getPersonByEmail(email.getPath()));
+        }
+        if(personSet.size() < 2) return "{}";
+        /*
+        Set<HasA> hasASet = dao.getHasAByPerson(p.getPersonID());
+        Set<Device> deviceSet = new HashSet<>();
+        for (HasA h : hasASet) {
+            deviceSet.add(dao.getDevice(h.getDeviceID()));
+        }
+        
+        Set<Rendezvous> rendezvousSet = null;
+        for (Device d : deviceSet) {
+            if(MODE == 0){
+                rendezvousSet = getRendezvousByThingAndTime(d.getThingID(), Q, W);  //rendezvous/thingandtime/{thingID}/{Q}/{W}
+            }else if(MODE == 1){
+                rendezvousSet = getRendezvousByMHubAndTime(d.getMhubID(), Q, W);   //duration/mhubandtime/{mhubID}/{Q}/{W}
+            }
+            if(rendezvousSet == null) return "{}";
+            for (Rendezvous re: rendezvousSet) {
+                Device d2 = null;
+                if(MODE == 0){
+                    d2 = dao.getDeviceByMHub(re.getMhubID());
+                }else if(MODE == 1){
+                    d2 = dao.getDeviceByThing(re.getThingID());
+                }
+                HasA h = dao.getHasAByDevice(d2.getDeviceID());
+                Person p = dao.getPerson(h.getPersonID());
+                returnJson += "{\"name\': \"" + p.getPersonName() + "\", "
+                        + "\"email\": \"" + p.getPersonEmail() + "\", ";
+                
+                if(MODE == 0){
+                    returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
+                }else if(MODE == 1){
+                    returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
+                }
+                
+                returnJson += "\"start\": " + re.getStart() + ", ";
+                returnJson += "\"end\": " + re.getEnd() + "}, ";
+            }
+        }*/
 
         String returnJson = "{ "
-                + "\"hospitals\": "
-                + "[";
-        Occupancy oc;
-        Map<String, Set<String>> insurancesAndSpecialties;
-        Address ad;
-        for (Hospital h : hospitalSet) {
-            ad = dao.getAddress(h.getAddressID());
-            oc = getHospitalOccupancy(h);
-            insurancesAndSpecialties = getInsurancesAndSpecialties(h);
-            returnJson += "\n{\"name\': \'" + h.getHospitalName() + "\', "
-                    + " \"nPatientsNow\": " + oc.getnPatientsNow() + ", "
-                    + "\"avgWaitTime\": " + oc.getAvgWaitTime() + ", "
-                    + "\"acceptedInsurances\": "
-                    + insurancesAndSpecialties.get("insurances") + ", "
-                    + "\"specialities\": "
-                    + insurancesAndSpecialties.get("specialties") + ", "
-                    + "\"lat\": " + h.getLatitude() + ", "
-                    + "\"long\": " + h.getLongitude() + ", "
-                    + "\"address\": {"
-                    + "\"state\": \"" + ad.getState() + "\", "
-                    + "\"city\": \"" + ad.getCity() + "\", "
-                    + "\"neighborhood\": \"" + ad.getNeighborhood() + "\", "
-                    + "\"zipcode\": ";
-
-            //Check if there is a zipcode
-            returnJson += (ad.getZipcode() != null)
-                    ? "\"" + ad.getZipcode() + "\", "
-                    : "null, ";
-
-            returnJson += "\"street\": " + ad.getStreet() + ", "
-                    + "\"number\": " + ad.getNumber() + ", "
-                    + "\"AdditionalInfo\": ";
-
-            //Check if there is Additional Info
-            returnJson += (ad.getAdditionalInfo() != null)
-                    ? "\"" + ad.getAdditionalInfo() + "\"}}, "
-                    : "null}}, ";
-        }
-        //Removes the last coma and space
-        returnJson = returnJson.substring(0, returnJson.length() - 2);
-        returnJson += "]}";
+                + "\"persons\": "
+                + "[{\"rendezvous\': \"" + flag + "\"]}\n";
+        
         return returnJson;
     }
     
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("hospital/byinsuraceandcity/{insuranceID}/{city}")
-    public String getHospitalByInsuraceAndCity(@PathParam("insuranceID") long iID, @PathParam("city") String city) throws Exception {
-
-        Set<Hospital> hospitalSet = dao.getHospitalsByCityAndInsurance(city, iID);
-
-        String returnJson = "{ "
-                + "\"hospitals\": "
-                + "[";
-        Occupancy oc;
-        Map<String, Set<String>> insurancesAndSpecialties;
-        Address ad;
-        for (Hospital h : hospitalSet) {
-            ad = dao.getAddress(h.getAddressID());
-            oc = getHospitalOccupancy(h);
-            insurancesAndSpecialties = getInsurancesAndSpecialties(h);
-            returnJson += "\n{\"name\': \'" + h.getHospitalName() + "\', "
-                    + " \"nPatientsNow\": " + oc.getnPatientsNow() + ", "
-                    + "\"avgWaitTime\": " + oc.getAvgWaitTime() + ", "
-                    + "\"acceptedInsurances\": "
-                    + insurancesAndSpecialties.get("insurances") + ", "
-                    + "\"specialities\": "
-                    + insurancesAndSpecialties.get("specialties") + ", "
-                    + "\"lat\": " + h.getLatitude() + ", "
-                    + "\"long\": " + h.getLongitude() + ", "
-                    + "\"address\": {"
-                    + "\"state\": \"" + ad.getState() + "\", "
-                    + "\"city\": \"" + ad.getCity() + "\", "
-                    + "\"neighborhood\": \"" + ad.getNeighborhood() + "\", "
-                    + "\"zipcode\": ";
-
-            //Check if there is a zipcode
-            returnJson += (ad.getZipcode() != null)
-                    ? "\"" + ad.getZipcode() + "\", "
-                    : "null, ";
-
-            returnJson += "\"street\": " + ad.getStreet() + ", "
-                    + "\"number\": " + ad.getNumber() + ", "
-                    + "\"AdditionalInfo\": ";
-
-            //Check if there is Additional Info
-            returnJson += (ad.getAdditionalInfo() != null)
-                    ? "\"" + ad.getAdditionalInfo() + "\"}}, "
-                    : "null}}, ";
-        }
-        //Removes the last coma and space
-        returnJson = returnJson.substring(0, returnJson.length() - 2);
-        returnJson += "]}";
-        return returnJson;
-    }
-    
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("hospital/byspecialtyandinsuranceandcity/{specialtyID}/{insuranceID}/{city}")
-    public String getHospitalBySpeciatyAndCityAndInsurance(@PathParam("specialtyID") long sID, @PathParam("insuranceID") long iID, @PathParam("city") String city) throws Exception {
-
-        Set<Hospital> hospitalSet = dao.getHospitalsByCityAndSpecialtyAndInsurance(city, sID, iID);
-
-        String returnJson = "{ "
-                + "\"hospitals\": "
-                + "[";
-        Occupancy oc;
-        Map<String, Set<String>> insurancesAndSpecialties;
-        Address ad;
-        for (Hospital h : hospitalSet) {
-            ad = dao.getAddress(h.getAddressID());
-            oc = getHospitalOccupancy(h);
-            insurancesAndSpecialties = getInsurancesAndSpecialties(h);
-            returnJson += "\n{\"name\': \'" + h.getHospitalName() + "\', "
-                    + " \"nPatientsNow\": " + oc.getnPatientsNow() + ", "
-                    + "\"avgWaitTime\": " + oc.getAvgWaitTime() + ", "
-                    + "\"acceptedInsurances\": "
-                    + insurancesAndSpecialties.get("insurances") + ", "
-                    + "\"specialities\": "
-                    + insurancesAndSpecialties.get("specialties") + ", "
-                    + "\"lat\": " + h.getLatitude() + ", "
-                    + "\"long\": " + h.getLongitude() + ", "
-                    + "\"address\": {"
-                    + "\"state\": \"" + ad.getState() + "\", "
-                    + "\"city\": \"" + ad.getCity() + "\", "
-                    + "\"neighborhood\": \"" + ad.getNeighborhood() + "\", "
-                    + "\"zipcode\": ";
-
-            //Check if there is a zipcode
-            returnJson += (ad.getZipcode() != null)
-                    ? "\"" + ad.getZipcode() + "\", "
-                    : "null, ";
-
-            returnJson += "\"street\": " + ad.getStreet() + ", "
-                    + "\"number\": " + ad.getNumber() + ", "
-                    + "\"AdditionalInfo\": ";
-
-            //Check if there is Additional Info
-            returnJson += (ad.getAdditionalInfo() != null)
-                    ? "\"" + ad.getAdditionalInfo() + "\"}}, "
-                    : "null}}, ";
-        }
-        //Removes the last coma and space
-        returnJson = returnJson.substring(0, returnJson.length() - 2);
-        returnJson += "]}";
-        return returnJson;
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("hospital/top5")
-    public String getHospitalTop5() throws Exception {
-        
-        LinkedList<Hospital> hospitalComplete = new LinkedList(dao.getHospitals());
-        LinkedList<Hospital> hospitalTop5 = new LinkedList<>();
-        
-        //Sort the Hospitals
-        Collections.sort(hospitalComplete, hospitalComparator);
-        
-        //Get the top5
-        for(int i=0; i<5; i++){
-            if(hospitalComplete.size()>i)
-                hospitalTop5.add(hospitalComplete.get(i));
-            else
-                break;
-        }
-        
-
-        String returnJson = "{ "
-                + "\"hospitals\": "
-                + "[";
-        Occupancy oc;
-        Map<String, Set<String>> insurancesAndSpecialties;
-        Address ad;
-        for (Hospital h : hospitalTop5) {
-            ad = dao.getAddress(h.getAddressID());
-            oc = getHospitalOccupancy(h);
-            insurancesAndSpecialties = getInsurancesAndSpecialties(h);
-            returnJson += "\n{\"name\': \'" + h.getHospitalName() + "\', "
-                    + " \"nPatientsNow\": " + oc.getnPatientsNow() + ", "
-                    + "\"avgWaitTime\": " + oc.getAvgWaitTime() + ", "
-                    + "\"acceptedInsurances\": "
-                    + insurancesAndSpecialties.get("insurances") + ", "
-                    + "\"specialities\": "
-                    + insurancesAndSpecialties.get("specialties") + ", "
-                    + "\"lat\": " + h.getLatitude() + ", "
-                    + "\"long\": " + h.getLongitude() + ", "
-                    + "\"address\": {"
-                    + "\"state\": \"" + ad.getState() + "\", "
-                    + "\"city\": \"" + ad.getCity() + "\", "
-                    + "\"neighborhood\": \"" + ad.getNeighborhood() + "\", "
-                    + "\"zipcode\": ";
-
-            //Check if there is a zipcode
-            returnJson += (ad.getZipcode() != null)
-                    ? "\"" + ad.getZipcode() + "\", "
-                    : "null, ";
-
-            returnJson += "\"street\": " + ad.getStreet() + ", "
-                    + "\"number\": " + ad.getNumber() + ", "
-                    + "\"AdditionalInfo\": ";
-
-            //Check if there is Additional Info
-            returnJson += (ad.getAdditionalInfo() != null)
-                    ? "\"" + ad.getAdditionalInfo() + "\"}}, "
-                    : "null}}, ";
-        }
-        //Removes the last coma and space
-        returnJson = returnJson.substring(0, returnJson.length() - 2);
-        returnJson += "]}";
-        return returnJson;
-    }
-    
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("hospital/top5/byspecialtyandcity/{specialtyID}/{city}")
-    public String getHospitalTop5BySpeciatyAndCity(@PathParam("specialtyID") long sID, @PathParam("city") String city) throws Exception {
-        Set<Hospital> hospitalSet = dao.getHospitalsByCityAndSpecialty(city, sID);
-        LinkedList<Hospital> hospitalComplete = new LinkedList(hospitalSet);
-        LinkedList<Hospital> hospitalTop5 = new LinkedList<>();
-        
-        //Sort the Hospitals
-        Collections.sort(hospitalComplete, hospitalComparator);
-        
-        //Get the top5
-        for(int i=0; i<5; i++){
-            if(hospitalComplete.size()>i)
-                hospitalTop5.add(hospitalComplete.get(i));
-            else
-                break;
-        }
-        
-
-        String returnJson = "{ "
-                + "\"hospitals\": "
-                + "[";
-        Occupancy oc;
-        Map<String, Set<String>> insurancesAndSpecialties;
-        Address ad;
-        for (Hospital h : hospitalTop5) {
-            ad = dao.getAddress(h.getAddressID());
-            oc = getHospitalOccupancy(h);
-            insurancesAndSpecialties = getInsurancesAndSpecialties(h);
-            returnJson += "\n{\"name\': \'" + h.getHospitalName() + "\', "
-                    + " \"nPatientsNow\": " + oc.getnPatientsNow() + ", "
-                    + "\"avgWaitTime\": " + oc.getAvgWaitTime() + ", "
-                    + "\"acceptedInsurances\": "
-                    + insurancesAndSpecialties.get("insurances") + ", "
-                    + "\"specialities\": "
-                    + insurancesAndSpecialties.get("specialties") + ", "
-                    + "\"lat\": " + h.getLatitude() + ", "
-                    + "\"long\": " + h.getLongitude() + ", "
-                    + "\"address\": {"
-                    + "\"state\": \"" + ad.getState() + "\", "
-                    + "\"city\": \"" + ad.getCity() + "\", "
-                    + "\"neighborhood\": \"" + ad.getNeighborhood() + "\", "
-                    + "\"zipcode\": ";
-
-            //Check if there is a zipcode
-            returnJson += (ad.getZipcode() != null)
-                    ? "\"" + ad.getZipcode() + "\", "
-                    : "null, ";
-
-            returnJson += "\"street\": " + ad.getStreet() + ", "
-                    + "\"number\": " + ad.getNumber() + ", "
-                    + "\"AdditionalInfo\": ";
-
-            //Check if there is Additional Info
-            returnJson += (ad.getAdditionalInfo() != null)
-                    ? "\"" + ad.getAdditionalInfo() + "\"}}, "
-                    : "null}}, ";
-        }
-        //Removes the last coma and space
-        returnJson = returnJson.substring(0, returnJson.length() - 2);
-        returnJson += "]}";
-        return returnJson;
-    }
-    */
     // duration/thing/{thingID}
     private Set<Rendezvous> getDurationByThing(UUID thingID) throws Exception {
         UUID mhubID = null;
         long duration = 0;
         String url;
         String returnedJson;
-        HORYSProtocol hp;
-        Map<String, Object> parameters;
-        ArrayList<UUID> connectedMHubs;
+        Set<Rendezvous> rendezvousSet = null;
         
         //Get Average Duration
         url = HORYS
@@ -566,13 +290,15 @@ public class SemanticResource {
         returnedJson = sendGet(url, "GET");
         
         JSONArray data = new JSONArray(returnedJson);
-        JSONObject text = data.getJSONObject(0);
+        if(data.length() != 0){
+            JSONObject text = data.getJSONObject(0);
 
-        Set<Rendezvous> rendezvousSet = new HashSet<>();
-        mhubID = UUID.fromString(text.getString("mhubID"));
-        duration = text.getLong("duration");
-        rendezvousSet.add(new Rendezvous(mhubID, thingID, duration));
-
+            rendezvousSet = new HashSet<>();
+            mhubID = UUID.fromString(text.getString("mhubID"));
+            duration = text.getLong("duration");
+            rendezvousSet.add(new Rendezvous(mhubID, thingID, duration));
+        }
+        
         return rendezvousSet;
     }
     
@@ -582,32 +308,85 @@ public class SemanticResource {
         long duration = 0;
         String url;
         String returnedJson;
-        HORYSProtocol hp;
-        Map<String, Object> parameters;
-        ArrayList<UUID> connectedMHubs;
-        /*
+        Set<Rendezvous> rendezvousSet = null;
+        
         //Get Average Duration
         url = HORYS
-                + "/api/avgrendezvousduration/"+mhubID;
+                + "/api/duration/mhub/"+mhubID;
         returnedJson = sendGet(url, "GET");
-        hp = mapper.readValue(returnedJson, HORYSProtocol.class);
-        parameters = hp.getParameters();
-        avgDuration += (Double)parameters.get("average");
+        
+        JSONArray data = new JSONArray(returnedJson);
+        if(data.length() != 0){
+            JSONObject text = data.getJSONObject(0);
 
-        //Get connectedMHubs
-        url = HORYS
-                + "/api/connectedmhubs/"+thingID;
-        returnedJson = sendGet(url, "GET");
-        hp = mapper.readValue(returnedJson, HORYSProtocol.class);
-        parameters = hp.getParameters();
-        connectedMHubs = (ArrayList<UUID>)parameters.get("response");
-        nPatientsNow += connectedMHubs.size();
-        */
-        Set<Rendezvous> rendezvousSet = new HashSet<>();
-        rendezvousSet.add(new Rendezvous(mhubID, thingID, duration));
-
+            rendezvousSet = new HashSet<>();
+            thingID = UUID.fromString(text.getString("thingID"));
+            duration = text.getLong("duration");
+            rendezvousSet.add(new Rendezvous(mhubID, thingID, duration));
+        }
+        
         return rendezvousSet;
     }
+    
+    // rendezvous/thingandtime/{thingID}/{W}/{W}
+    private Set<Rendezvous> getRendezvousByThingAndTime(UUID thingID, long Q, long W) throws Exception {
+        UUID mhubID = null;
+        long start = 0;
+        long end = 0;
+        String url;
+        String returnedJson;
+        Set<Rendezvous> rendezvousSet = new HashSet<>();
+        
+        //Get Average Duration
+        //url = HORYS
+                //+ "/api/rendezvous/thingandtime/"+thingID+"/"+Q+"/"+W;
+        url = sHORYS
+                + "/api/rendezvous/thingandtime/"+thingID+"/"+Q+"/"+W;
+        returnedJson = sendGet(url, "GET");
+        
+        JSONArray data = new JSONArray(returnedJson);
+        for(int i = 0; i < data.length(); i++){
+            JSONObject text = data.getJSONObject(i);
+
+            mhubID = UUID.fromString(text.getString("mhubID"));
+            start = text.getLong("start");
+            end = text.getLong("end");
+            rendezvousSet.add(new Rendezvous(mhubID, thingID, start, end));
+        }
+        
+        return rendezvousSet;
+    }
+    
+    // rendezvous/mhubandtime/{mhubID}/{W}/{W}
+    private Set<Rendezvous> getRendezvousByMHubAndTime(UUID mhubID, long Q, long W) throws Exception {
+        UUID thingID = null;
+        long start = 0;
+        long end = 0;
+        String url;
+        String returnedJson;
+        Set<Rendezvous> rendezvousSet = null;
+        
+        //Get Average Duration
+        //url = HORYS
+                //+ "/api/rendezvous/mhubandtime/"+mhubID+"/"+Q+"/"+W;
+        url = sHORYS
+                + "/api/rendezvous/mhubandtime/"+mhubID+"/"+Q+"/"+W;
+        returnedJson = sendGet(url, "GET");
+        
+        JSONArray data = new JSONArray(returnedJson);
+        if(data.length() != 0){
+            JSONObject text = data.getJSONObject(0);
+
+            rendezvousSet = new HashSet<>();
+            thingID = UUID.fromString(text.getString("thingID"));
+            start = text.getLong("start");
+            end = text.getLong("end");
+            rendezvousSet.add(new Rendezvous(mhubID, thingID, start, end));
+        }
+        
+        return rendezvousSet;
+    }
+    
     /*
     private Map<String, Set<String>> getInsurancesAndSpecialties(Hospital h) {
         Map<String, Set<String>> returnMap = new HashMap<>();

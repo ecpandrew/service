@@ -100,6 +100,13 @@ public interface SemanticDao {
     public HasA getHasAByDevice(long deviceID);
     
     /**
+     * Gets all the specific HasA (Devices+Persons+Rooms) with a specific Person
+     * @param personID the id of the Person
+     * @return A Set of HasA containing the Devices, Persons and Rooms
+     */
+    public Set<HasA> getHasAByPerson(long personID);
+    
+    /**
      * Gets a specific Device
      * @param deviceID the id of the Device
      * @return the Device
@@ -142,88 +149,12 @@ public interface SemanticDao {
     public Person getPerson(long personID);
     
     /**
-     * Gets a specific Hospital
-     * @param hospitalID the id of the Hospital
-     * @return the Hospital
+     * Gets a specific Person
+     * @param personEmail the email of the Person
+     * @return the Person
      */
-    //public Hospital getHospital(long hospitalID);
+    public Person getPersonByEmail(String personEmail);
     
-    /**
-     * Gets all the beacons located at a specific room
-     * @param roomID the id of the room
-     * @return A Set of Beacons containing the Beacons located at the room
-     */
-    //public Set<Beacon> getBeaconsByRoom(long roomID);
-    
-    /**
-     * Gets all the beacons located at a specific Hospital
-     * @param hospitalID the id of the Hospital
-     * @return A Set of Beacons containing the Beacons located at the room
-     */
-    //public Set<Beacon> getBeaconsByHospital(long hospitalID);
-    
-    /**
-     * Gets all the Hospitals located in the Specified City
-     * @param city the name of the city
-     * @return a Set of Hospitals containing the Hospitals of the city
-     */
-    //public Set<Hospital> getHospitalsByCity(String city);
-    
-    /**
-     * Gets the Hospitals of a city that offers a given specialty
-     * @param city
-     * @param specialtyID
-     * @return a Set of Hospitals containing the Hospitals of the city that have
-     * the required Specialty
-     */
-    //public Set<Hospital> getHospitalsByCityAndSpecialty(String city, long specialtyID);
-    
-    /**
-     * Gets the Hospitals of a city that offers services to a given Insurance
-     * @param city
-     * @param insuranceID
-     * @return a Set of Hospitals containing the Hospitals of the city that offers
-     * services to the Insurance
-     */
-    //public Set<Hospital> getHospitalsByCityAndInsurance(String city, long insuranceID);
-    
-    /**
-     * Gets the Hospitals of a city that offers a given specialty for
-     * patients with a given insurance
-     * @param city
-     * @param specialtyID
-     * @param insuranceID
-     * @return a Set of Hospitals containing the Hospitals of the city that offers
-     * the required Specialty for the given Insurance
-     */
-    //public Set<Hospital> getHospitalsByCityAndSpecialtyAndInsurance(String city, long specialtyID, long insuranceID);
-    /**
-     * Gets all the AcceptedBySpecialty related to a given Hospital
-     * @param hospitalID the id of the Hospital
-     * @return a Set of AcceptedBySpecialty related to the Hospital
-     */
-    //public Set<AcceptedBySpecialty> getAcceptedBySpecialtyByHospital(long hospitalID);
-    
-    /**
-     * Gets a specific Address
-     * @param addressID the id of the Address
-     * @return the Address
-     */
-    //public Address getAddress(long addressID);
-    
-    /**
-     * Gets a specific Insurance
-     * @param insuranceID the id of the insurance
-     * @return the Insurance
-     */
-    //public Insurance getInsurance(long insuranceID);
-    
-    /**
-     * Gets a specific Specialty
-     * @param specialtyID the id of the Specialty
-     * @return the Specialty
-     */
-    //public Specialty getSpecialty(long specialtyID);
 }
 
 

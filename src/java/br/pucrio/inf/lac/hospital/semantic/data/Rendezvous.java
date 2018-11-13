@@ -10,6 +10,8 @@ public class Rendezvous {
     private long signal;
     private long timestamp;
     private long duration;
+    private long start;
+    private long end;
 
     public Rendezvous() {
     }
@@ -18,6 +20,13 @@ public class Rendezvous {
         this.mhubID = mhubID;
         this.thingID = thingID;
         this.duration = duration;
+    }
+    
+    public Rendezvous(UUID mhubID, UUID thingID, long start, long end) {
+        this.mhubID = mhubID;
+        this.thingID = thingID;
+        this.start = start;
+        this.end = end;
     }
 
     public Rendezvous(UUID mhubID, UUID thingID, long latitude, long longitude, long timestamp) {
@@ -92,10 +101,26 @@ public class Rendezvous {
     public void setDuration(long duration) {
         this.duration = duration;
     }
-    
-    @Override
-    public String toString() {
-        return "Rendezvous{" + "mhubID=" + mhubID + ", thingID=" + thingID + ", latitude=" + latitude + ", longitude=" + longitude + ", signal=" + signal + ", timestamp=" + timestamp + ", duration=" + duration + '}';
+
+    public long getStart() {
+        return start;
     }
 
+    public void setStart(long start) {
+        this.start = start;
+    }
+
+    public long getEnd() {
+        return end;
+    }
+
+    public void setEnd(long end) {
+        this.end = end;
+    }
+
+    @Override
+    public String toString() {
+        return "Rendezvous{" + "mhubID=" + mhubID + ", thingID=" + thingID + ", latitude=" + latitude + ", longitude=" + longitude + ", signal=" + signal + ", timestamp=" + timestamp + ", duration=" + duration + ", start=" + start + ", end=" + end + '}';
+    }
+    
 }

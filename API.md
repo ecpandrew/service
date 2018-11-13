@@ -29,25 +29,6 @@ Example:
 ```
 
 
-### **GET**   `/person/byroomandperson/{roomName}/{personEmail}/...`
-#### Retorna se a(s) pessoa(s) ABC está(ão) agora no espaço físico XYZ e por quanto tempo
-
-Example:
-
-`http://localhost:8080/semantic/person/byroomandperson/Sala%20das%20ETs/daniel@lsdi.ufma.br/`
-
-```json
-[
-    {
-        "name":     "Daniel",
-        "email":    "daniel@lsdi.ufma.br",
-        "mhubID":   "399eba78-2346-4c20-81ba-0a8cad5fdd22",
-        "duration": 3600
-    }
-]
-```
-
-
 ### **GET**   `/person/byroomandtime/{roomName}/{Q}/{W}/`
 #### Retorna as pessoas que estiveram no espaço físico XYZ entre o timestamp Q e o timestamp W o tempo dos encontros
 
@@ -84,19 +65,19 @@ Example:
 ```
 
 
-### **GET**   `/room/byperson/{personID}/...`
+### **GET**   `/room/byperson/{personEmail}/...`
 #### Retorna o espaço físico que a(s) pessoa(s) ABC está agora e por quanto tempo
 
 Example:
 
-`http://localhost:8080/semantic/room/byperson/1/2/`
+`http://localhost:8080/semantic/room/byperson/daniel@lsdi.ufma.br/alysson@lsdi.ufma.br/`
 
 ```json
 [
     {
         "roomID":	1,
         "roomName":	"Sala das ETs",
-        "name":     "Daniel",
+        "name":     	"Daniel",
         "email":	"daniel@lsdi.ufma.br",
         "mhubID":	"399eba78-2346-4c20-81ba-0a8cad5fdd22",
         "duration":	3600
@@ -113,12 +94,12 @@ Example:
 ```
 
 
-### **GET**   `/room/bytimeandperson/{Q}/{W}/{personID}/...`
-#### Retorna o espaço físico que a(s) pessoa(s) ABC estiveram entre o timestamp Q e o timestamp W e o tempo dos encontros
+### **GET**   `/room/bytimeandperson/{Q}/{W}/{personEmail}/...`
+#### Retorna o espaço físico que a(s) pessoa(s) ABC estiveram entre o timestamp Q e o timestamp W
 
 Example:
 
-`http://localhost:8080/semantic/room/byperson/1/2/`
+`http://localhost:8080/semantic/room/byperson/daniel@lsdi.ufma.br/alysson@lsdi.ufma.br/`
 
 ```json
 [

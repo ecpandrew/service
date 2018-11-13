@@ -172,7 +172,8 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 -- -----------------------------------------------------
 START TRANSACTION;
 USE `service`;
-INSERT INTO `service`.`Person` (`personID`, `personName`, `personEmail`) VALUES (1, 'Daniel', 'daniel.carvalho@lsdi.ufma.br');
+INSERT INTO `service`.`Person` (`personID`, `personName`, `personEmail`) VALUES (1, 'Daniel', 'daniel@lsdi.ufma.br');
+INSERT INTO `service`.`Person` (`personID`, `personName`, `personEmail`) VALUES (2, 'Alyson', 'alysson@lsdi.ufma.br');
 
 COMMIT;
 
@@ -233,6 +234,7 @@ COMMIT;
 START TRANSACTION;
 USE `service`;
 INSERT INTO `service`.`MHub` (`mhubID`) VALUES ('a246df10-7902-3715-9abc-e4148bb97788');
+INSERT INTO `service`.`MHub` (`mhubID`) VALUES ('4729ce72-09eb-4307-845e-eb9957e9b490');
 
 COMMIT;
 
@@ -244,6 +246,7 @@ START TRANSACTION;
 USE `service`;
 INSERT INTO `service`.`Device` (`deviceID`, `manufacturer`, `model`, `mhubID`, `thingID`) VALUES (1, 'LSDi', 'Arduino', NULL, 'f80638aa-e7d7-3f8b-b538-aa8f78cce93b');
 INSERT INTO `service`.`Device` (`deviceID`, `manufacturer`, `model`, `mhubID`, `thingID`) VALUES (2, 'ASUS', 'Zenfone 3', 'a246df10-7902-3715-9abc-e4148bb97788', NULL);
+INSERT INTO `service`.`Device` (`deviceID`, `manufacturer`, `model`, `mhubID`, `thingID`) VALUES (3, 'Galaxy', 'S8', '4729ce72-09eb-4307-845e-eb9957e9b490', NULL);
 
 COMMIT;
 
@@ -255,6 +258,7 @@ START TRANSACTION;
 USE `service`;
 INSERT INTO `service`.`HasA` (`hasAID`, `deviceID`, `personID`, `roomID`) VALUES (1, 1, NULL, 1);
 INSERT INTO `service`.`HasA` (`hasAID`, `deviceID`, `personID`, `roomID`) VALUES (2, 2, 1, NULL);
+INSERT INTO `service`.`HasA` (`hasAID`, `deviceID`, `personID`, `roomID`) VALUES (3, 3, 2, NULL);
 
 COMMIT;
 

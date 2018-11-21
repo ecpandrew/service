@@ -596,7 +596,27 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
     
     @Override
-    public Room getRoom(String room) {
+    public Room getRoom(long roomID) {
+        String sql = "SELECT * FROM Room "
+                   + "WHERE roomID = "+roomID;
+
+        HashSet<String> columnName = new HashSet<>();
+        columnName.add("roomID");
+        columnName.add("roomName");
+        columnName.add("sectionID");
+
+        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
+        Room r = null;
+        for (Map<String, String> resulti : selectResult) {
+            r = new Room(roomID,
+                    resulti.get("roomName"),
+                    Long.parseLong(resulti.get("sectionID")));
+        }
+        return r;
+    }
+    
+    @Override
+    public Room getRoomByName(String room) {
         String sql = "SELECT * FROM Room "
                    + "WHERE roomName = \'"+room+"\'";
 

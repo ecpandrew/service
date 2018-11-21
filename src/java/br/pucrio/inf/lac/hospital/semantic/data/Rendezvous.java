@@ -12,6 +12,8 @@ public class Rendezvous {
     private long duration;
     private long start;
     private long end;
+    private String personName;
+    private String roomName;
 
     public Rendezvous() {
     }
@@ -27,6 +29,13 @@ public class Rendezvous {
         this.thingID = thingID;
         this.start = start;
         this.end = end;
+    }
+    
+    public Rendezvous(String personName, String roomName, long start, long end) {
+        this.start = start;
+        this.end = end;
+        this.personName = personName;
+        this.roomName = roomName;
     }
 
     public Rendezvous(UUID mhubID, UUID thingID, long latitude, long longitude, long timestamp) {
@@ -118,6 +127,22 @@ public class Rendezvous {
         this.end = end;
     }
 
+    public String getPersonName() {
+        return personName;
+    }
+
+    public void setPersonName(String personName) {
+        this.personName = personName;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+    
     @Override
     public String toString() {
         return "Rendezvous{" + "mhubID=" + mhubID + ", thingID=" + thingID + ", latitude=" + latitude + ", longitude=" + longitude + ", signal=" + signal + ", timestamp=" + timestamp + ", duration=" + duration + ", start=" + start + ", end=" + end + '}';

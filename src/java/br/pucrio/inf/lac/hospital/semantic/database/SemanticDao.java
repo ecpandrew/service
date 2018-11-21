@@ -80,10 +80,17 @@ public interface SemanticDao {
      */
     /**
      * Gets a specific Room
+     * @param roomID the id of the Room
+     * @return the Room
+     */
+    public Room getRoom(long roomID);
+    
+    /**
+     * Gets a specific Room
      * @param room the name of the Room
      * @return the Room
      */
-    public Room getRoom(String room);
+    public Room getRoomByName(String room);
     
     /**
      * Gets all the HasA (Devices+Persons+Rooms) located at a specific Room

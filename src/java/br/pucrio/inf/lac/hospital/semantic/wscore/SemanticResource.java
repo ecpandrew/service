@@ -124,7 +124,7 @@ public class SemanticResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("person/byroom/{room}/")
     public String getPersonByRoom(@PathParam("room") String room) throws Exception {
-        Room r = dao.getRoom(room);
+        Room r = dao.getRoomByName(room);
         if(r == null) return "{}";
         Set<HasA> hasASet = dao.getHasAByRoom(r.getRoomID());
         Set<Device> deviceSet = new HashSet<>();
@@ -174,7 +174,7 @@ public class SemanticResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("person/byroomandtime/{room}/{Q}/{W}/")
     public String getPersonByRoomAndTime(@PathParam("room") String room, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
-        Room r = dao.getRoom(room);
+        Room r = dao.getRoomByName(room);
         if(r == null) return "{}";
         Set<HasA> hasASet = dao.getHasAByRoom(r.getRoomID());
         Set<Device> deviceSet = new HashSet<>();
@@ -192,7 +192,9 @@ public class SemanticResource {
             }else if(MODE == 1){
                 rendezvousSet = getRendezvousByMHubAndTime(d.getMhubID(), Q, W);   //duration/mhubandtime/{mhubID}/{Q}/{W}
             }
-            if(rendezvousSet == null) return "{}";
+            if(rendezvousSet == null){
+                returnJson += "{}";
+            }else{
             for (Rendezvous re: rendezvousSet) {
                 Device d2 = null;
                 if(MODE == 0){
@@ -213,6 +215,7 @@ public class SemanticResource {
                 
                 returnJson += "\"start\": " + re.getStart() + ", ";
                 returnJson += "\"end\": " + re.getEnd() + "}, ";
+            }
             }
         }
         //Removes the last coma and space
@@ -226,52 +229,44 @@ public class SemanticResource {
     @Path("person/rendezvous/{Q}/{W}/{emails: .*}/")
     public String getPersonRendezvous(@PathParam("Q") long Q, @PathParam("W") long W, @PathParam("emails") List<PathSegment> emails) throws Exception {
         boolean flag = false;
-        Set<Person> personSet = new HashSet<>();
+        Set<Person> personGroup = new HashSet<>();
+        Set<Rendezvous> reSet = new HashSet<>();
         for (PathSegment email: emails) {
-            personSet.add(dao.getPersonByEmail(email.getPath()));
+            personGroup.add(dao.getPersonByEmail(email.getPath()));
         }
-        if(personSet.size() < 2) return "{}";
-        /*
-        Set<HasA> hasASet = dao.getHasAByPerson(p.getPersonID());
-        Set<Device> deviceSet = new HashSet<>();
-        for (HasA h : hasASet) {
-            deviceSet.add(dao.getDevice(h.getDeviceID()));
+        if(personGroup.size() < 2) return "{}";
+        for (Person p: personGroup){
+            Set<HasA> hasASet = dao.getHasAByPerson(p.getPersonID());
+            Set<Device> deviceSet = new HashSet<>();
+            for (HasA h : hasASet) {
+                deviceSet.add(dao.getDevice(h.getDeviceID()));
+            }
+
+            Set<Rendezvous> rendezvousSet = null;
+            for (Device d : deviceSet) {
+                if(MODE == 0){
+                    rendezvousSet = getRendezvousByMHubAndTime(d.getMhubID(), Q, W);   //duration/mhubandtime/{mhubID}/{Q}/{W}
+                }else if(MODE == 1){
+                    rendezvousSet = getRendezvousByThingAndTime(d.getThingID(), Q, W);  //rendezvous/thingandtime/{thingID}/{Q}/{W}
+                }
+                if(rendezvousSet == null) return "{}";
+                for (Rendezvous re: rendezvousSet) {
+                    Device d2 = null;
+                    if(MODE == 0){
+                        d2 = dao.getDeviceByThing(re.getThingID());
+                    }else if(MODE == 1){
+                        d2 = dao.getDeviceByMHub(re.getMhubID());
+                    }
+                    HasA h = dao.getHasAByDevice(d2.getDeviceID());
+                    Room r = dao.getRoom(h.getRoomID());
+                    reSet.add(new Rendezvous(p.getPersonName(), r.getRoomName(), re.getStart(), re.getEnd()));
+                }
+            }
         }
-        
-        Set<Rendezvous> rendezvousSet = null;
-        for (Device d : deviceSet) {
-            if(MODE == 0){
-                rendezvousSet = getRendezvousByThingAndTime(d.getThingID(), Q, W);  //rendezvous/thingandtime/{thingID}/{Q}/{W}
-            }else if(MODE == 1){
-                rendezvousSet = getRendezvousByMHubAndTime(d.getMhubID(), Q, W);   //duration/mhubandtime/{mhubID}/{Q}/{W}
-            }
-            if(rendezvousSet == null) return "{}";
-            for (Rendezvous re: rendezvousSet) {
-                Device d2 = null;
-                if(MODE == 0){
-                    d2 = dao.getDeviceByMHub(re.getMhubID());
-                }else if(MODE == 1){
-                    d2 = dao.getDeviceByThing(re.getThingID());
-                }
-                HasA h = dao.getHasAByDevice(d2.getDeviceID());
-                Person p = dao.getPerson(h.getPersonID());
-                returnJson += "{\"name\': \"" + p.getPersonName() + "\", "
-                        + "\"email\": \"" + p.getPersonEmail() + "\", ";
-                
-                if(MODE == 0){
-                    returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
-                }else if(MODE == 1){
-                    returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
-                }
-                
-                returnJson += "\"start\": " + re.getStart() + ", ";
-                returnJson += "\"end\": " + re.getEnd() + "}, ";
-            }
-        }*/
 
         String returnJson = "{ "
-                + "\"persons\": "
-                + "[{\"rendezvous\': \"" + flag + "\"]}\n";
+                + "\"rendezvous\": "
+                + "[{\"person\': \"" + flag + "\"]}\n";
         
         return returnJson;
     }

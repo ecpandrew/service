@@ -10,8 +10,8 @@ public class Rendezvous {
     private long signal;
     private long timestamp;
     private long duration;
-    private long start;
-    private long end;
+    private long arrive;
+    private long depart;
     private String personName;
     private String roomName;
 
@@ -24,16 +24,16 @@ public class Rendezvous {
         this.duration = duration;
     }
     
-    public Rendezvous(UUID mhubID, UUID thingID, long start, long end) {
+    public Rendezvous(UUID mhubID, UUID thingID, long arrive, long depart) {
         this.mhubID = mhubID;
         this.thingID = thingID;
-        this.start = start;
-        this.end = end;
+        this.arrive = arrive;
+        this.depart = depart;
     }
     
-    public Rendezvous(String personName, String roomName, long start, long end) {
-        this.start = start;
-        this.end = end;
+    public Rendezvous(String personName, String roomName, long arrive, long depart) {
+        this.arrive = arrive;
+        this.depart = depart;
         this.personName = personName;
         this.roomName = roomName;
     }
@@ -111,20 +111,20 @@ public class Rendezvous {
         this.duration = duration;
     }
 
-    public long getStart() {
-        return start;
+    public long getArrive() {
+        return arrive;
     }
 
-    public void setStart(long start) {
-        this.start = start;
+    public void setArrive(long arrive) {
+        this.arrive = arrive;
     }
 
-    public long getEnd() {
-        return end;
+    public long getDepart() {
+        return depart;
     }
 
-    public void setEnd(long end) {
-        this.end = end;
+    public void setDepart(long depart) {
+        this.depart = depart;
     }
 
     public String getPersonName() {
@@ -145,7 +145,7 @@ public class Rendezvous {
     
     @Override
     public String toString() {
-        return "Rendezvous{" + "mhubID=" + mhubID + ", thingID=" + thingID + ", latitude=" + latitude + ", longitude=" + longitude + ", signal=" + signal + ", timestamp=" + timestamp + ", duration=" + duration + ", start=" + start + ", end=" + end + '}';
+        return "Rendezvous{" + "mhubID=" + mhubID + ", thingID=" + thingID + ", latitude=" + latitude + ", longitude=" + longitude + ", signal=" + signal + ", timestamp=" + timestamp + ", duration=" + duration + ", arrive=" + arrive + ", depart=" + depart + '}';
     }
     
 }

@@ -5,6 +5,7 @@ import br.pucrio.inf.lac.hospital.semantic.data.Beacon;
 import br.pucrio.inf.lac.hospital.semantic.data.Building;
 import br.pucrio.inf.lac.hospital.semantic.data.City;
 import br.pucrio.inf.lac.hospital.semantic.data.Device;
+import br.pucrio.inf.lac.hospital.semantic.data.GroupRendezvous;
 import br.pucrio.inf.lac.hospital.semantic.data.HasA;
 import br.pucrio.inf.lac.hospital.semantic.data.MHub;
 import br.pucrio.inf.lac.hospital.semantic.data.Person;
@@ -213,8 +214,8 @@ public class SemanticResource {
                     returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
                 }
                 
-                returnJson += "\"start\": " + re.getStart() + ", ";
-                returnJson += "\"end\": " + re.getEnd() + "}, ";
+                returnJson += "\"arrive\": " + re.getArrive() + ", ";
+                returnJson += "\"depart\": " + re.getDepart() + "}, ";
             }
             }
         }
@@ -231,6 +232,7 @@ public class SemanticResource {
         boolean flag = false;
         Set<Person> personGroup = new HashSet<>();
         Set<Rendezvous> reSet = new HashSet<>();
+        ArrayList<GroupRendezvous> gReSet = new ArrayList<>();
         for (PathSegment email: emails) {
             personGroup.add(dao.getPersonByEmail(email.getPath()));
         }
@@ -245,7 +247,7 @@ public class SemanticResource {
             Set<Rendezvous> rendezvousSet = null;
             for (Device d : deviceSet) {
                 if(MODE == 0){
-                    rendezvousSet = getRendezvousByMHubAndTime(d.getMhubID(), Q, W);   //duration/mhubandtime/{mhubID}/{Q}/{W}
+                    rendezvousSet = getRendezvousByMHubAndTime(d.getMhubID(), Q, W);   //rendezvous/mhubandtime/{mhubID}/{Q}/{W}
                 }else if(MODE == 1){
                     rendezvousSet = getRendezvousByThingAndTime(d.getThingID(), Q, W);  //rendezvous/thingandtime/{thingID}/{Q}/{W}
                 }
@@ -259,9 +261,25 @@ public class SemanticResource {
                     }
                     HasA h = dao.getHasAByDevice(d2.getDeviceID());
                     Room r = dao.getRoom(h.getRoomID());
-                    reSet.add(new Rendezvous(p.getPersonName(), r.getRoomName(), re.getStart(), re.getEnd()));
+                    reSet.add(new Rendezvous(p.getPersonName(), r.getRoomName(), re.getArrive(), re.getDepart()));
                 }
             }
+        }
+        
+        for (Rendezvous re1 : reSet) {
+            GroupRendezvous gr = new GroupRendezvous(re1.getRoomName(), re1.getArrive(), re1.getDepart());
+            gr.getPersonGroup().add(re1.getPersonName());
+            for (Rendezvous re2 : reSet) {
+                if(!gr.getPersonGroup().contains(re2.getPersonName())){
+                    if(gr.getRoomName().equals(re2.getRoomName()) && gr.getArrive() <= re2.getDepart() && gr.getDepart() >= re2.getArrive()){
+                        gr.getPersonGroup().add(re2.getPersonName());
+                        if(gr.getArrive() > re2.getArrive()) gr.setArrive(re2.getArrive());
+                        if(gr.getDepart() > re2.getDepart()) gr.setDepart(re2.getDepart());
+                    }
+                }
+            }
+            if(gr.getPersonGroup().size() >= 2)
+                gReSet.add(gr);
         }
 
         String returnJson = "{ "

@@ -56,8 +56,9 @@ public class SemanticResource {
     private ObjectMapper mapper;
     
     /** The  Horys restport. */
-    private final String HORYS = "http://lsdi.ufma.br:7981";
+    private final String HORYS = "http://localhost:7981";
     private final String sHORYS = "http://localhost:8080/service/webresources/simulatedhoriz";
+    
     /** The Service Mode: */
     /** 0: Room has a beacon, Person has a mhub */
     /** 1: Room has a mhub, Person has a beacon */
@@ -126,16 +127,17 @@ public class SemanticResource {
     @Path("person/byroom/{room}/")
     public String getPersonByRoom(@PathParam("room") String room) throws Exception {
         Room r = dao.getRoomByName(room);
-        if(r == null) return "{}";
+        if(r == null) return "[]";
         Set<HasA> hasASet = dao.getHasAByRoom(r.getRoomID());
         Set<Device> deviceSet = new HashSet<>();
         for (HasA h : hasASet) {
             deviceSet.add(dao.getDevice(h.getDeviceID()));
         }
 
-        String returnJson = "{ "
-                + "\"persons\": "
-                + "[";
+        String returnJson = "[";
+        //String returnJson = "{ "
+        //        + "\"persons\": "
+        //        + "[";
         Set<Rendezvous> rendezvousSet = null;
         for (Device d : deviceSet) {
             if(MODE == 0){
@@ -143,7 +145,7 @@ public class SemanticResource {
             }else if(MODE == 1){
                 rendezvousSet = getDurationByMHub(d.getMhubID());   //duration/mhub/{mhubID}
             }
-            if(rendezvousSet == null) return "{}";
+            if(rendezvousSet == null) return "[]";
             for (Rendezvous re: rendezvousSet) {
                 Device d2 = null;
                 if(MODE == 0){
@@ -153,7 +155,7 @@ public class SemanticResource {
                 }
                 HasA h = dao.getHasAByDevice(d2.getDeviceID());
                 Person p = dao.getPerson(h.getPersonID());
-                returnJson += "{\"name\': \"" + p.getPersonName() + "\", "
+                returnJson += "{\"name\": \"" + p.getPersonName() + "\", "
                         + "\"email\": \"" + p.getPersonEmail() + "\", ";
                 
                 if(MODE == 0){
@@ -167,7 +169,7 @@ public class SemanticResource {
         }
         //Removes the last coma and space
         returnJson = returnJson.substring(0, returnJson.length() - 2);
-        returnJson += "]}\n";
+        returnJson += "]";
         return returnJson;
     }
     
@@ -176,16 +178,17 @@ public class SemanticResource {
     @Path("person/byroomandtime/{room}/{Q}/{W}/")
     public String getPersonByRoomAndTime(@PathParam("room") String room, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
         Room r = dao.getRoomByName(room);
-        if(r == null) return "{}";
+        if(r == null) return "[]";
         Set<HasA> hasASet = dao.getHasAByRoom(r.getRoomID());
         Set<Device> deviceSet = new HashSet<>();
         for (HasA h : hasASet) {
             deviceSet.add(dao.getDevice(h.getDeviceID()));
         }
 
-        String returnJson = "{ "
-                + "\"persons\": "
-                + "[";
+        String returnJson = "[";
+        //String returnJson = "{ "
+        //        + "\"persons\": "
+        //        + "[";
         Set<Rendezvous> rendezvousSet = null;
         for (Device d : deviceSet) {
             if(MODE == 0){
@@ -193,9 +196,7 @@ public class SemanticResource {
             }else if(MODE == 1){
                 rendezvousSet = getRendezvousByMHubAndTime(d.getMhubID(), Q, W);   //duration/mhubandtime/{mhubID}/{Q}/{W}
             }
-            if(rendezvousSet == null){
-                returnJson += "{}";
-            }else{
+            if(rendezvousSet == null) return "[]";
             for (Rendezvous re: rendezvousSet) {
                 Device d2 = null;
                 if(MODE == 0){
@@ -205,7 +206,7 @@ public class SemanticResource {
                 }
                 HasA h = dao.getHasAByDevice(d2.getDeviceID());
                 Person p = dao.getPerson(h.getPersonID());
-                returnJson += "{\"name\': \"" + p.getPersonName() + "\", "
+                returnJson += "{\"name\": \"" + p.getPersonName() + "\", "
                         + "\"email\": \"" + p.getPersonEmail() + "\", ";
                 
                 if(MODE == 0){
@@ -217,11 +218,10 @@ public class SemanticResource {
                 returnJson += "\"arrive\": " + re.getArrive() + ", ";
                 returnJson += "\"depart\": " + re.getDepart() + "}, ";
             }
-            }
         }
         //Removes the last coma and space
         returnJson = returnJson.substring(0, returnJson.length() - 2);
-        returnJson += "]}\n";
+        returnJson += "]";
         return returnJson;
     }
     
@@ -234,9 +234,10 @@ public class SemanticResource {
         Set<Rendezvous> reSet = new HashSet<>();
         ArrayList<GroupRendezvous> gReSet = new ArrayList<>();
         for (PathSegment email: emails) {
+            if(dao.getPersonByEmail(email.getPath()) == null) return "[]";
             personGroup.add(dao.getPersonByEmail(email.getPath()));
         }
-        if(personGroup.size() < 2) return "{}";
+        if(personGroup.size() < 2 || personGroup.size() != emails.size()) return "[]";
         for (Person p: personGroup){
             Set<HasA> hasASet = dao.getHasAByPerson(p.getPersonID());
             Set<Device> deviceSet = new HashSet<>();
@@ -251,7 +252,7 @@ public class SemanticResource {
                 }else if(MODE == 1){
                     rendezvousSet = getRendezvousByThingAndTime(d.getThingID(), Q, W);  //rendezvous/thingandtime/{thingID}/{Q}/{W}
                 }
-                if(rendezvousSet == null) return "{}";
+                if(rendezvousSet == null) return "[]";
                 for (Rendezvous re: rendezvousSet) {
                     Device d2 = null;
                     if(MODE == 0){
@@ -273,18 +274,144 @@ public class SemanticResource {
                 if(!gr.getPersonGroup().contains(re2.getPersonName())){
                     if(gr.getRoomName().equals(re2.getRoomName()) && gr.getArrive() <= re2.getDepart() && gr.getDepart() >= re2.getArrive()){
                         gr.getPersonGroup().add(re2.getPersonName());
-                        if(gr.getArrive() > re2.getArrive()) gr.setArrive(re2.getArrive());
+                        if(gr.getArrive() < re2.getArrive()) gr.setArrive(re2.getArrive());
                         if(gr.getDepart() > re2.getDepart()) gr.setDepart(re2.getDepart());
                     }
                 }
             }
-            if(gr.getPersonGroup().size() >= 2)
-                gReSet.add(gr);
+            if(gr.getPersonGroup().size() >= 2) {
+                if(gReSet.isEmpty()){
+                    gReSet.add(gr);
+                }else if(!(containsGroupRendezvous(gReSet, gr))){
+                    gReSet.add(gr);
+                }
+            }
         }
 
-        String returnJson = "{ "
-                + "\"rendezvous\": "
-                + "[{\"person\': \"" + flag + "\"]}\n";
+        String returnJson = "[";
+        //String returnJson = "{ "
+        //        + "\"rendezvous\": "
+        //        + "[";
+        for (GroupRendezvous gr : gReSet) {
+            returnJson += "{\"room\": \"" + gr.getRoomName() + "\", ";
+            returnJson += "\"person\": [";
+            for (String s : gr.getPersonGroup()) {
+                returnJson += "{\"name\": \"" + s + "\"}, ";
+            }
+            returnJson = returnJson.substring(0, returnJson.length() - 2);
+            returnJson += "], ";
+            returnJson += "\"arrive\": " + gr.getArrive() + ", ";
+            returnJson += "\"depart\": " + gr.getDepart() + "}, ";
+        }
+         //Removes the last coma and space
+        returnJson = returnJson.substring(0, returnJson.length() - 2);
+        returnJson += "]";
+        return returnJson;
+    }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("room/byperson/{emails: .*}/")
+    public String getRoomByPerson(@PathParam("emails") List<PathSegment> emails) throws Exception {
+        Set<Person> personGroup = new HashSet<>();
+        for (PathSegment email: emails) {
+            personGroup.add(dao.getPersonByEmail(email.getPath()));
+        }
+        if(personGroup.size() != emails.size()) return "[]";
+        
+        String returnJson = "[";
+        for (Person p: personGroup){
+            Set<HasA> hasASet = dao.getHasAByPerson(p.getPersonID());
+            Set<Device> deviceSet = new HashSet<>();
+            for (HasA h : hasASet) {
+                deviceSet.add(dao.getDevice(h.getDeviceID()));
+            }
+
+            Set<Rendezvous> rendezvousSet = null;
+            for (Device d : deviceSet) {
+                if(MODE == 0){
+                    rendezvousSet = getDurationByMHub(d.getMhubID());   //duration/mhub/{mhubID}
+                }else if(MODE == 1){
+                    rendezvousSet = getDurationByThing(d.getThingID());  //duration/thing/{thingID}
+                }
+                if(rendezvousSet == null) return "[]";
+                for (Rendezvous re: rendezvousSet) {
+                    Device d2 = null;
+                    if(MODE == 0){
+                        d2 = dao.getDeviceByThing(re.getThingID());
+                    }else if(MODE == 1){
+                        d2 = dao.getDeviceByMHub(re.getMhubID());
+                    }
+                    HasA h = dao.getHasAByDevice(d2.getDeviceID());
+                    Room r = dao.getRoom(h.getRoomID());
+                    
+                    returnJson += "{\"name\": \"" + p.getPersonName() + "\", "
+                        + "\"room\": \"" + r.getRoomName() + "\", ";
+                    if(MODE == 0){
+                        returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
+                    }else if(MODE == 1){
+                        returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
+                    }
+                    returnJson += "\"duration\": " + re.getDuration() + "}, ";
+                }
+            }
+        }
+        returnJson = returnJson.substring(0, returnJson.length() - 2);
+        returnJson += "]";
+        
+        return returnJson;
+    }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("room/bypersonandtime/{Q}/{W}/{emails: .*}/")
+    public String getRoomByPersonAndTime(@PathParam("Q") long Q, @PathParam("W") long W, @PathParam("emails") List<PathSegment> emails) throws Exception {
+        Set<Person> personGroup = new HashSet<>();
+        for (PathSegment email: emails) {
+            personGroup.add(dao.getPersonByEmail(email.getPath()));
+        }
+        if(personGroup.size() != emails.size()) return "[]";
+        
+        String returnJson = "[";
+        for (Person p: personGroup){
+            Set<HasA> hasASet = dao.getHasAByPerson(p.getPersonID());
+            Set<Device> deviceSet = new HashSet<>();
+            for (HasA h : hasASet) {
+                deviceSet.add(dao.getDevice(h.getDeviceID()));
+            }
+
+            Set<Rendezvous> rendezvousSet = null;
+            for (Device d : deviceSet) {
+                if(MODE == 0){
+                    rendezvousSet = getRendezvousByMHubAndTime(d.getMhubID(), Q, W);   //rendezvous/mhubandtime/{mhubID}/{Q}/{W}
+                }else if(MODE == 1){
+                    rendezvousSet = getRendezvousByThingAndTime(d.getThingID(), Q, W);  //rendezvous/thingandtime/{thingID}/{Q}/{W}
+                }
+                if(rendezvousSet == null) return "[]";
+                for (Rendezvous re: rendezvousSet) {
+                    Device d2 = null;
+                    if(MODE == 0){
+                        d2 = dao.getDeviceByThing(re.getThingID());
+                    }else if(MODE == 1){
+                        d2 = dao.getDeviceByMHub(re.getMhubID());
+                    }
+                    HasA h = dao.getHasAByDevice(d2.getDeviceID());
+                    Room r = dao.getRoom(h.getRoomID());
+                    
+                    returnJson += "{\"name\": \"" + p.getPersonName() + "\", "
+                        + "\"room\": \"" + r.getRoomName() + "\", ";
+                    if(MODE == 0){
+                        returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
+                    }else if(MODE == 1){
+                        returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
+                    }
+                    returnJson += "\"arrive\": " + re.getArrive() + ", ";
+                    returnJson += "\"depart\": " + re.getDepart() + "}, ";
+                }
+            }
+        }
+        returnJson = returnJson.substring(0, returnJson.length() - 2);
+        returnJson += "]";
         
         return returnJson;
     }
@@ -344,16 +471,14 @@ public class SemanticResource {
     // rendezvous/thingandtime/{thingID}/{W}/{W}
     private Set<Rendezvous> getRendezvousByThingAndTime(UUID thingID, long Q, long W) throws Exception {
         UUID mhubID = null;
-        long start = 0;
-        long end = 0;
+        long arrive = 0;
+        long depart = 0;
         String url;
         String returnedJson;
         Set<Rendezvous> rendezvousSet = new HashSet<>();
         
         //Get Average Duration
-        //url = HORYS
-                //+ "/api/rendezvous/thingandtime/"+thingID+"/"+Q+"/"+W;
-        url = sHORYS
+        url = HORYS
                 + "/api/rendezvous/thingandtime/"+thingID+"/"+Q+"/"+W;
         returnedJson = sendGet(url, "GET");
         
@@ -362,9 +487,9 @@ public class SemanticResource {
             JSONObject text = data.getJSONObject(i);
 
             mhubID = UUID.fromString(text.getString("mhubID"));
-            start = text.getLong("start");
-            end = text.getLong("end");
-            rendezvousSet.add(new Rendezvous(mhubID, thingID, start, end));
+            arrive = text.getLong("arrive");
+            depart = text.getLong("depart");
+            rendezvousSet.add(new Rendezvous(mhubID, thingID, arrive, depart));
         }
         
         return rendezvousSet;
@@ -373,28 +498,25 @@ public class SemanticResource {
     // rendezvous/mhubandtime/{mhubID}/{W}/{W}
     private Set<Rendezvous> getRendezvousByMHubAndTime(UUID mhubID, long Q, long W) throws Exception {
         UUID thingID = null;
-        long start = 0;
-        long end = 0;
+        long arrive = 0;
+        long depart = 0;
         String url;
         String returnedJson;
-        Set<Rendezvous> rendezvousSet = null;
+        Set<Rendezvous> rendezvousSet = new HashSet<>();
         
         //Get Average Duration
-        //url = HORYS
-                //+ "/api/rendezvous/mhubandtime/"+mhubID+"/"+Q+"/"+W;
-        url = sHORYS
+        url = HORYS
                 + "/api/rendezvous/mhubandtime/"+mhubID+"/"+Q+"/"+W;
         returnedJson = sendGet(url, "GET");
         
         JSONArray data = new JSONArray(returnedJson);
-        if(data.length() != 0){
-            JSONObject text = data.getJSONObject(0);
+       for(int i = 0; i < data.length(); i++){
+            JSONObject text = data.getJSONObject(i);
 
-            rendezvousSet = new HashSet<>();
             thingID = UUID.fromString(text.getString("thingID"));
-            start = text.getLong("start");
-            end = text.getLong("end");
-            rendezvousSet.add(new Rendezvous(mhubID, thingID, start, end));
+            arrive = text.getLong("arrive");
+            depart = text.getLong("depart");
+            rendezvousSet.add(new Rendezvous(mhubID, thingID, arrive, depart));
         }
         
         return rendezvousSet;
@@ -424,7 +546,7 @@ public class SemanticResource {
         return returnMap;
     }
     */
-    // HTTP GET request
+    
     private String sendGet(String url, String method) throws Exception {
 
         URL obj = new URL(url);
@@ -452,5 +574,14 @@ public class SemanticResource {
 
         return response.toString();
 
+    }
+    
+    private boolean containsGroupRendezvous(ArrayList<GroupRendezvous> grs, GroupRendezvous gr){
+        for (GroupRendezvous g : grs) {
+            if(g.getRoomName().equals(gr.getRoomName()) && g.getArrive() == gr.getArrive() && g.getDepart() == gr.getDepart()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -34,16 +34,23 @@ Example:
 
 Example:
 
-`http://localhost:8080/semantic/person/byroomandtime/Sala%20das%20ETs/1538956800/1539043200/`
+`http://localhost:8080/semantic/person/byroomandtime/Sala%20das%20ETs/1551113150/1551287880/`
 
 ```json
 [
     {
-        "name":     "Daniel",
-        "email":    "daniel@lsdi.ufma.br",
-        "mhubID":   "399eba78-2346-4c20-81ba-0a8cad5fdd22",
-        "start":    1539007200,
-        "end":      1539018000
+        "name": "Daniel", 
+        "email": "daniel@lsdi.ufma.br", 
+        "mhubID": "a246df10-7902-3715-9abc-e4148bb97788", 
+        "arrive": 1551287871, 
+        "depart": 1551287876
+    }, 
+    {
+        "name": "Daniel", 
+        "email": "daniel@lsdi.ufma.br", 
+        "mhubID": "a246df10-7902-3715-9abc-e4148bb97788", 
+        "arrive": 1551113153, 
+        "depart": 1551113220
     }
 ]
 ```
@@ -54,12 +61,22 @@ Example:
 
 Example:
 
-`http://localhost:8080/semantic/person/bytimeandperson/1538956800/1539043200/daniel@lsdi.ufma.br/alysson@lsdi.ufma.br/`
+`http://localhost:8080/semantic/person/rendezvous/1551113150/1551287880/daniel@lsdi.ufma.br/alysson@lsdi.ufma.br`
 
 ```json
 [
     {
-        "rendezvous":	"true"
+        "room": "Sala das ETs", 
+        "person": [
+            {
+                "name": "Alyson"
+            }, 
+            {
+                "name": "Daniel"
+            }
+        ], 
+        "arrive": 1551113190, 
+        "depart": 1551113208
     }
 ]
 ```
@@ -75,42 +92,50 @@ Example:
 ```json
 [
     {
-        "roomID":	1,
-        "roomName":	"Sala das ETs",
-        "name":     	"Daniel",
-        "email":	"daniel@lsdi.ufma.br",
-        "mhubID":	"399eba78-2346-4c20-81ba-0a8cad5fdd22",
+        "name": "Daniel", 
+        "room": "Sala das ETs", 
+        "thingID": "f80638aa-e7d7-3f8b-b538-aa8f78cce93b", 
         "duration":	3600
     },
     {
-        "roomID":	2,
-        "roomName":	"Sala das ETs",
-        "name":		"Alysson",
-        "email":	"alysson@lsdi.ufma.br",
-        "mhubID":	"d4d70f9c-b5fa-4a47-8441-e90c8942f6ff",
+        "name": "Alyson", 
+        "room": "Sala das ETs", 
+        "thingID": "f80638aa-e7d7-3f8b-b538-aa8f78cce93b", 
         "duration":	7200
     }
 ]
 ```
 
 
-### **GET**   `/room/bytimeandperson/{Q}/{W}/{personEmail}/...`
+### **GET**   `/room/bypersonandtime/{Q}/{W}/{personEmail}/...`
 #### Retorna o espaço físico que a(s) pessoa(s) ABC estiveram entre o timestamp Q e o timestamp W
 
 Example:
 
-`http://localhost:8080/semantic/room/byperson/daniel@lsdi.ufma.br/alysson@lsdi.ufma.br/`
+`http://localhost:8080/semantic/room/bypersonandtime/1551113150/1551287880/daniel@lsdi.ufma.br/alysson@lsdi.ufma.br`
 
 ```json
 [
     {
-        "roomID":   1,
-        "roomName": "Sala das ETs",
-        "name":     "Daniel",
-        "email":    "daniel@lsdi.ufma.br",
-        "mhubID":   "399eba78-2346-4c20-81ba-0a8cad5fdd22",
-        "start":    1539007200,
-        "end":      1539018000
+        "name": "Daniel", 
+        "room": "Sala das ETs", 
+        "thingID": "f80638aa-e7d7-3f8b-b538-aa8f78cce93b", 
+        "arrive": 1551287871, 
+        "depart": 1551287876
+    }, 
+    {
+        "name": "Daniel", 
+        "room": "Sala das ETs", 
+        "thingID": "f80638aa-e7d7-3f8b-b538-aa8f78cce93b", 
+        "arrive": 1551113153, 
+        "depart": 1551113208
+    }, 
+    {
+        "name": "Alyson", 
+        "room": "Sala das ETs", 
+        "thingID": "f80638aa-e7d7-3f8b-b538-aa8f78cce93b", 
+        "arrive": 1551113190, 
+        "depart": 1551113220
     }
 ]
 ```

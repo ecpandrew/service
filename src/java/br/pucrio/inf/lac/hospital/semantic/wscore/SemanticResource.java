@@ -192,9 +192,9 @@ public class SemanticResource {
         Set<Rendezvous> rendezvousSet = null;
         for (Device d : deviceSet) {
             if(MODE == 0){
-                rendezvousSet = getRendezvousByThingAndTime(d.getThingID(), Q, W);  //rendezvous/thingandtime/{thingID}/{Q}/{W}
+                rendezvousSet = getDurationByThing(d.getThingID(), Q, W);  //duration/thing/{thingID}/{W}/{delta}
             }else if(MODE == 1){
-                rendezvousSet = getRendezvousByMHubAndTime(d.getMhubID(), Q, W);   //duration/mhubandtime/{mhubID}/{Q}/{W}
+                rendezvousSet = getDurationByMHub(d.getMhubID(), Q, W);   //duration/mhub/{mhubID}/{W}/{delta}
             }
             if(rendezvousSet == null) return "[]";
             for (Rendezvous re: rendezvousSet) {
@@ -248,9 +248,9 @@ public class SemanticResource {
             Set<Rendezvous> rendezvousSet = null;
             for (Device d : deviceSet) {
                 if(MODE == 0){
-                    rendezvousSet = getRendezvousByMHubAndTime(d.getMhubID(), Q, W);   //rendezvous/mhubandtime/{mhubID}/{Q}/{W}
+                    rendezvousSet = getDurationByMHub(d.getMhubID(), Q, W);   //duration/thing/{thingID}/{W}/{delta}
                 }else if(MODE == 1){
-                    rendezvousSet = getRendezvousByThingAndTime(d.getThingID(), Q, W);  //rendezvous/thingandtime/{thingID}/{Q}/{W}
+                    rendezvousSet = getDurationByThing(d.getThingID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
                 }
                 if(rendezvousSet == null) return "[]";
                 for (Rendezvous re: rendezvousSet) {
@@ -383,9 +383,9 @@ public class SemanticResource {
             Set<Rendezvous> rendezvousSet = null;
             for (Device d : deviceSet) {
                 if(MODE == 0){
-                    rendezvousSet = getRendezvousByMHubAndTime(d.getMhubID(), Q, W);   //rendezvous/mhubandtime/{mhubID}/{Q}/{W}
+                    rendezvousSet = getDurationByMHub(d.getMhubID(), Q, W);   //duration/thing/{thingID}/{W}/{delta}
                 }else if(MODE == 1){
-                    rendezvousSet = getRendezvousByThingAndTime(d.getThingID(), Q, W);  //rendezvous/thingandtime/{thingID}/{Q}/{W}
+                    rendezvousSet = getDurationByThing(d.getThingID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
                 }
                 if(rendezvousSet == null) return "[]";
                 for (Rendezvous re: rendezvousSet) {
@@ -468,18 +468,19 @@ public class SemanticResource {
         return rendezvousSet;
     }
     
-    // rendezvous/thingandtime/{thingID}/{W}/{W}
-    private Set<Rendezvous> getRendezvousByThingAndTime(UUID thingID, long Q, long W) throws Exception {
+    // duration/thing/{thingID}/{W}/delta
+    private Set<Rendezvous> getDurationByThing(UUID thingID, long Q, long W) throws Exception {
         UUID mhubID = null;
         long arrive = 0;
         long depart = 0;
         String url;
         String returnedJson;
         Set<Rendezvous> rendezvousSet = new HashSet<>();
+        long delta = W - Q;
         
         //Get Average Duration
         url = HORYS
-                + "/api/rendezvous/thingandtime/"+thingID+"/"+Q+"/"+W;
+                + "/api/duration/thing/"+thingID+"/"+W+"/"+delta;
         returnedJson = sendGet(url, "GET");
         
         JSONArray data = new JSONArray(returnedJson);
@@ -495,18 +496,19 @@ public class SemanticResource {
         return rendezvousSet;
     }
     
-    // rendezvous/mhubandtime/{mhubID}/{W}/{W}
-    private Set<Rendezvous> getRendezvousByMHubAndTime(UUID mhubID, long Q, long W) throws Exception {
+    // duration/mhub/{mhubID}/{W}/{delta}
+    private Set<Rendezvous> getDurationByMHub(UUID mhubID, long Q, long W) throws Exception {
         UUID thingID = null;
         long arrive = 0;
         long depart = 0;
         String url;
         String returnedJson;
         Set<Rendezvous> rendezvousSet = new HashSet<>();
+        long delta = W - Q;
         
         //Get Average Duration
         url = HORYS
-                + "/api/rendezvous/mhubandtime/"+mhubID+"/"+Q+"/"+W;
+                + "/api/duration/mhub/"+mhubID+"/"+W+"/"+delta;
         returnedJson = sendGet(url, "GET");
         
         JSONArray data = new JSONArray(returnedJson);
@@ -521,31 +523,6 @@ public class SemanticResource {
         
         return rendezvousSet;
     }
-    
-    /*
-    private Map<String, Set<String>> getInsurancesAndSpecialties(Hospital h) {
-        Map<String, Set<String>> returnMap = new HashMap<>();
-
-        Set<String> insurances = new HashSet<>();
-        Set<String> specialties = new HashSet<>();
-
-        Set<AcceptedBySpecialty> accSet;
-        accSet = dao.getAcceptedBySpecialtyByHospital(h.getHospitalID());
-        if (accSet != null) {
-            for (AcceptedBySpecialty acc : accSet) {
-                Insurance i = dao.getInsurance(acc.getInsuranceID());
-                insurances.add("\"" + i.getInsuranceName() + "\"");
-                Specialty s = dao.getSpecialty(acc.getSpecialtyID());
-                specialties.add("\"" + s.getSpecialtyname() + "\"");
-            }
-        }
-
-        returnMap.put("insurances", insurances);
-        returnMap.put("specialties", specialties);
-
-        return returnMap;
-    }
-    */
     
     private String sendGet(String url, String method) throws Exception {
 

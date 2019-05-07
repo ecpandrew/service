@@ -9,6 +9,8 @@ import br.pucrio.inf.lac.hospital.semantic.data.MHub;
 import br.pucrio.inf.lac.hospital.semantic.data.Person;
 import br.pucrio.inf.lac.hospital.semantic.data.Room;
 import br.pucrio.inf.lac.hospital.semantic.data.Section;
+import br.pucrio.inf.lac.hospital.semantic.data.Thing;
+import br.pucrio.inf.lac.hospital.semantic.wscore.REST;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -24,9 +26,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class SemanticDaoImpMariaDB implements SemanticDao{
     private Connection conn;
+    private final String semantic = "http://localhost:8080/api/";
     
     public SemanticDaoImpMariaDB(){
         connectToDB();
@@ -214,7 +219,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 +d.getDeviceID()+", \'"
                 +d.getManufacturer()+"\', \'"
                 +d.getModel()+"\', \'"
-                +d.getMhubID()+"\', \'"
+                +d.getMHubID()+"\', \'"
                 +d.getThingID()+"\')";
         return processInsert(sql, "deviceID");
     }
@@ -359,7 +364,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         String sql = "UPDATE Device "
                    + "SET manufacturer = \'"+d.getManufacturer()+"\', "
                    + "model = \'"+d.getModel()+"\', "
-                   + "mhubID = \'"+d.getMhubID()+"\', "
+                   + "mhubID = \'"+d.getMHubID()+"\', "
                    + "thingID = \'"+d.getThingID()+"\' "
                    + "WHERE deviceID = "+d.getDeviceID();
         return (processUpdate(sql)>0);
@@ -526,7 +531,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
 
         for (Map<String, String> resulti : selectResult) {
-            MHub m = new MHub(UUID.fromString(resulti.get("mhubID")));
+            MHub m = new MHub(UUID.fromString(resulti.get("mhubID")), "");
             resultSet.add(m);
         }
         return resultSet;
@@ -597,20 +602,25 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     
     @Override
     public Room getRoom(long roomID) {
-        String sql = "SELECT * FROM Room "
-                   + "WHERE roomID = "+roomID;
-
-        HashSet<String> columnName = new HashSet<>();
-        columnName.add("roomID");
-        columnName.add("roomName");
-        columnName.add("sectionID");
-
-        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
+        String url;
+        String returnedJson;
+        JSONArray data = null;
         Room r = null;
-        for (Map<String, String> resulti : selectResult) {
-            r = new Room(roomID,
-                    resulti.get("roomName"),
-                    Long.parseLong(resulti.get("sectionID")));
+        
+        url = semantic+ "rooms/"+roomID;
+        try {
+            returnedJson = REST.sendGet(url, "GET");
+            data = new JSONArray(returnedJson);
+        
+            if(data.length() != 0){
+                JSONObject text = data.getJSONObject(0);
+
+                r = new Room(roomID,
+                        text.getString("roomName"),
+                        text.getLong("sectionID"));
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         return r;
     }
@@ -636,26 +646,56 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
     
     @Override
-    public Set<HasA> getHasAByRoom(long roomID){
-        Set<HasA> resultSet = new HashSet<>();
-        String sql = "SELECT * FROM HasA "
-                   + "WHERE roomID = "+roomID;
-        HashSet<String> columnName = new HashSet<>();
-        columnName.add("hasAID");
-        columnName.add("deviceID");
-        columnName.add("personID");
-        columnName.add("roomID");
+    public Set<Device> getThingsByRoom(long roomID){
+        Set<Device> resultSet = new HashSet<>();
         
-        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
+        String url;
+        String returnedJson;
+        JSONArray data = null;
+        Room r = null;
         
-        //Add the beacons to the resultSet
-        for(Map<String, String> resulti : selectResult){
-            //if(resulti.get("personID").isEmpty())
-            HasA h = new HasA(Long.parseLong(resulti.get("hasAID")),
-                                  Long.parseLong(resulti.get("deviceID")),
-                                  0,
-                                  roomID);
-            resultSet.add(h);
+        url = semantic+ "rooms/"+roomID+"/things";
+        try {
+            returnedJson = REST.sendGet(url, "GET");
+            data = new JSONArray(returnedJson);
+        
+            if(data.length() != 0){
+                JSONObject text = data.getJSONObject(0);
+
+                Device d = new Thing(UUID.fromString(text.getString("UUID")),
+                                  text.getString("description"));
+                resultSet.add(d);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return resultSet;
+    }
+    
+    @Override
+    public Set<Device> getMHubsByRoom(long roomID){
+        Set<Device> resultSet = new HashSet<>();
+        
+        String url;
+        String returnedJson;
+        JSONArray data = null;
+        Room r = null;
+        
+        url = semantic+ "rooms/"+roomID+"/mhubs";
+        try {
+            returnedJson = REST.sendGet(url, "GET");
+            data = new JSONArray(returnedJson);
+        
+            if(data.length() != 0){
+                JSONObject text = data.getJSONObject(0);
+
+                Device d = new MHub(UUID.fromString(text.getString("UUID")),
+                                  text.getString("description"));
+                resultSet.add(d);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return resultSet;
@@ -810,7 +850,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
         MHub m = null;
         for (Map<String, String> resulti : selectResult) {
-            m = new MHub(UUID.fromString(resulti.get("mhubID")));
+            m = new MHub(UUID.fromString(resulti.get("mhubID")), "");
         }
         return m;
     }
@@ -855,6 +895,75 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         return p;
     }
     
+    @Override
+    public Person getPersonByMHub(UUID mhubID) {
+        String url;
+        String returnedJson;
+        JSONArray data;
+        Person p = null;
+        
+        url = semantic+ "things/"+mhubID;
+        try {
+            returnedJson = REST.sendGet(url, "GET");
+            data = new JSONArray(returnedJson);
+        
+            if(data.length() != 0){
+                JSONObject text = data.getJSONObject(0);
+                JSONArray data2 = text.getJSONArray("holder");
+                JSONObject text2 = data2.getJSONObject(0);
+                
+                url = semantic+"users/"+text2.getString("id");
+                
+                returnedJson = REST.sendGet(url, "GET");
+                data = new JSONArray(returnedJson);
+                if(data.length() != 0){
+                text = data.getJSONObject(0);
+                
+                p = new Person(text.getLong("id"),
+                        text.getString("name"),
+                        text.getString("email"));
+                }
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return p;
+    }
+    
+    @Override
+    public Person getPersonByThing(UUID thingID) {
+        String url;
+        String returnedJson;
+        JSONArray data;
+        Person p = null;
+        
+        url = semantic+ "mhubs/"+thingID;
+        try {
+            returnedJson = REST.sendGet(url, "GET");
+            data = new JSONArray(returnedJson);
+        
+            if(data.length() != 0){
+                JSONObject text = data.getJSONObject(0);
+                JSONArray data2 = text.getJSONArray("holder");
+                JSONObject text2 = data2.getJSONObject(0);
+                
+                url = semantic+"users/"+text2.getString("id");
+                
+                returnedJson = REST.sendGet(url, "GET");
+                data = new JSONArray(returnedJson);
+                if(data.length() != 0){
+                text = data.getJSONObject(0);
+                
+                p = new Person(text.getLong("id"),
+                        text.getString("name"),
+                        text.getString("email"));
+                }
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return p;
+    }
 }
 
 

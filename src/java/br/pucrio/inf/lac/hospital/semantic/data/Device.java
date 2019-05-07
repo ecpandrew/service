@@ -9,6 +9,7 @@ public class Device {
     private String model;
     private UUID mhubID;
     private UUID thingID;
+    private UUID uuID;
 
     public Device() {
     }
@@ -19,6 +20,11 @@ public class Device {
         this.model = model;
         this.mhubID = mhubID;
         this.thingID = thingID;
+    }
+    
+    public Device(UUID uuID, String manufacturer) {
+        this.uuID = uuID;
+        this.manufacturer = manufacturer;
     }
     
     public long getDeviceID() {
@@ -45,11 +51,11 @@ public class Device {
         this.model = model;
     }
 
-    public UUID getMhubID() {
+    public UUID getMHubID() {
         return mhubID;
     }
 
-    public void setMhubID(UUID mhubID) {
+    public void setMHubID(UUID mhubID) {
         this.mhubID = mhubID;
     }
 
@@ -64,6 +70,14 @@ public class Device {
     @Override
     public String toString() {
         return "Device{" + "deviceID=" + deviceID + ", manufacturer=" + manufacturer + ", model=" + model + ", mhubID=" + mhubID + ", thingID=" + thingID + '}';
+    }
+
+    public UUID getUuID() {
+        return uuID;
+    }
+
+    public void setUuID(UUID uuID) {
+        this.uuID = uuID;
     }
     
 }

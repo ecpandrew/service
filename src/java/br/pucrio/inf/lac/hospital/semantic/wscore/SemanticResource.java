@@ -1,46 +1,46 @@
 package br.pucrio.inf.lac.hospital.semantic.wscore;
 
-import br.pucrio.inf.lac.hospital.horys.protocol.HORYSProtocol;
-import br.pucrio.inf.lac.hospital.semantic.data.Beacon;
-import br.pucrio.inf.lac.hospital.semantic.data.Building;
-import br.pucrio.inf.lac.hospital.semantic.data.City;
+//import br.pucrio.inf.lac.hospital.horys.protocol.HORYSProtocol;
+//import br.pucrio.inf.lac.hospital.semantic.data.Beacon;
+//import br.pucrio.inf.lac.hospital.semantic.data.Building;
+//import br.pucrio.inf.lac.hospital.semantic.data.City;
 import br.pucrio.inf.lac.hospital.semantic.data.Device;
 import br.pucrio.inf.lac.hospital.semantic.data.GroupRendezvous;
-import br.pucrio.inf.lac.hospital.semantic.data.HasA;
-import br.pucrio.inf.lac.hospital.semantic.data.MHub;
+//import br.pucrio.inf.lac.hospital.semantic.data.HasA;
+//import br.pucrio.inf.lac.hospital.semantic.data.MHub;
 import br.pucrio.inf.lac.hospital.semantic.data.Person;
 import br.pucrio.inf.lac.hospital.semantic.data.Rendezvous;
 import br.pucrio.inf.lac.hospital.semantic.data.Room;
-import br.pucrio.inf.lac.hospital.semantic.data.Section;
-import br.pucrio.inf.lac.hospital.semantic.data.Thing;
+//import br.pucrio.inf.lac.hospital.semantic.data.Section;
+//import br.pucrio.inf.lac.hospital.semantic.data.Thing;
 import br.pucrio.inf.lac.hospital.semantic.database.SemanticDao;
 import br.pucrio.inf.lac.hospital.semantic.database.SemanticDaoImpMariaDB;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+//import java.io.BufferedReader;
+//import java.io.InputStreamReader;
+//import java.net.HttpURLConnection;
+//import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
+//import java.util.Collections;
+//import java.util.Comparator;
+//import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
+//import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+//import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
-import javax.ws.rs.Consumes;
+//import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PUT;
+//import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
@@ -232,41 +232,43 @@ public class SemanticResource {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("person/rendezvous/{Q}/{W}/{emails: .*}/")
-    public String getPersonRendezvous(@PathParam("Q") long Q, @PathParam("W") long W, @PathParam("emails") List<PathSegment> emails) throws Exception {
+    @Path("person/rendezvous/{Q}/{W}/{ids: .*}/")
+    public String getPersonRendezvous(@PathParam("Q") long Q, @PathParam("W") long W, @PathParam("ids") List<PathSegment> ids) throws Exception {
         boolean flag = false;
         Set<Person> personGroup = new HashSet<>();
         Set<Rendezvous> reSet = new HashSet<>();
         ArrayList<GroupRendezvous> gReSet = new ArrayList<>();
-        for (PathSegment email: emails) {
-            if(dao.getPersonByEmail(email.getPath()) == null) return "[]";
-            personGroup.add(dao.getPersonByEmail(email.getPath()));
+        for (PathSegment id: ids) {
+            Person p = dao.getPerson(Long.getLong(id.getPath()));
+            if(p == null) return "[]";
+            personGroup.add(p);
         }
-        if(personGroup.size() < 2 || personGroup.size() != emails.size()) return "[]";
+        if(personGroup.size() < 2 || personGroup.size() != ids.size()) return "[]";
         for (Person p: personGroup){
-            Set<HasA> hasASet = dao.getHasAByPerson(p.getPersonID());
-            Set<Device> deviceSet = new HashSet<>();
-            for (HasA h : hasASet) {
-                deviceSet.add(dao.getDevice(h.getDeviceID()));
+            //Set<HasA> hasASet = dao.getHasAByPerson(p.getPersonID());
+            Set<Device> deviceSet;
+            if(MODE == 0){
+                deviceSet = dao.getThingsByPerson(p.getPersonID());
+            }else{
+                deviceSet = dao.getMHubsByPerson(p.getPersonID());
             }
 
-            Set<Rendezvous> rendezvousSet = null;
+            Set<Rendezvous> rendezvousSet;
             for (Device d : deviceSet) {
                 if(MODE == 0){
-                    rendezvousSet = getDurationByMHub(d.getMhubID(), Q, W);   //duration/thing/{thingID}/{W}/{delta}
-                }else if(MODE == 1){
-                    rendezvousSet = getDurationByThing(d.getThingID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
+                    rendezvousSet = getDurationByMHub(d.getUuID(), Q, W);   //duration/thing/{thingID}/{W}/{delta}
+                }else{
+                    rendezvousSet = getDurationByThing(d.getUuID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
                 }
                 if(rendezvousSet == null) return "[]";
                 for (Rendezvous re: rendezvousSet) {
-                    Device d2 = null;
+                    Room r;
                     if(MODE == 0){
-                        d2 = dao.getDeviceByThing(re.getThingID());
-                    }else if(MODE == 1){
-                        d2 = dao.getDeviceByMHub(re.getMhubID());
+                        r = dao.getRoomByThing(re.getThingID());
+                    }else{
+                        r = dao.getRoomByMHub(re.getMhubID());
                     }
-                    HasA h = dao.getHasAByDevice(d2.getDeviceID());
-                    Room r = dao.getRoom(h.getRoomID());
+                    
                     reSet.add(new Rendezvous(p.getPersonName(), r.getRoomName(), re.getArrive(), re.getDepart()));
                 }
             }
@@ -316,39 +318,41 @@ public class SemanticResource {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("room/byperson/{emails: .*}/")
-    public String getRoomByPerson(@PathParam("emails") List<PathSegment> emails) throws Exception {
+    @Path("room/byperson/{ids: .*}/")
+    public String getRoomByPerson(@PathParam("ids") List<PathSegment> ids) throws Exception {
         Set<Person> personGroup = new HashSet<>();
-        for (PathSegment email: emails) {
-            personGroup.add(dao.getPersonByEmail(email.getPath()));
+        for (PathSegment id: ids) {
+            Person p = dao.getPerson(Long.getLong(id.getPath()));
+            if(p == null) return "[]";
+            personGroup.add(p);
         }
-        if(personGroup.size() != emails.size()) return "[]";
+        if(personGroup.size() < 2 || personGroup.size() != ids.size()) return "[]";
         
         String returnJson = "[";
         for (Person p: personGroup){
-            Set<HasA> hasASet = dao.getHasAByPerson(p.getPersonID());
-            Set<Device> deviceSet = new HashSet<>();
-            for (HasA h : hasASet) {
-                deviceSet.add(dao.getDevice(h.getDeviceID()));
+            //Set<HasA> hasASet = dao.getHasAByPerson(p.getPersonID());
+            Set<Device> deviceSet;
+            if(MODE == 0){
+                deviceSet = dao.getThingsByPerson(p.getPersonID());
+            }else{
+                deviceSet = dao.getMHubsByPerson(p.getPersonID());
             }
 
-            Set<Rendezvous> rendezvousSet = null;
+            Set<Rendezvous> rendezvousSet;
             for (Device d : deviceSet) {
                 if(MODE == 0){
-                    rendezvousSet = getDurationByMHub(d.getMhubID());   //duration/mhub/{mhubID}
-                }else if(MODE == 1){
-                    rendezvousSet = getDurationByThing(d.getThingID());  //duration/thing/{thingID}
+                    rendezvousSet = getDurationByMHub(d.getUuID());   //duration/mhub/{mhubID}
+                }else{
+                    rendezvousSet = getDurationByThing(d.getUuID());  //duration/thing/{thingID}
                 }
                 if(rendezvousSet == null) return "[]";
                 for (Rendezvous re: rendezvousSet) {
-                    Device d2 = null;
+                    Room r;
                     if(MODE == 0){
-                        d2 = dao.getDeviceByThing(re.getThingID());
-                    }else if(MODE == 1){
-                        d2 = dao.getDeviceByMHub(re.getMhubID());
+                        r = dao.getRoomByThing(re.getThingID());
+                    }else{
+                        r = dao.getRoomByMHub(re.getMhubID());
                     }
-                    HasA h = dao.getHasAByDevice(d2.getDeviceID());
-                    Room r = dao.getRoom(h.getRoomID());
                     
                     returnJson += "{\"name\": \"" + p.getPersonName() + "\", "
                         + "\"room\": \"" + r.getRoomName() + "\", ";
@@ -369,39 +373,40 @@ public class SemanticResource {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("room/bypersonandtime/{Q}/{W}/{emails: .*}/")
-    public String getRoomByPersonAndTime(@PathParam("Q") long Q, @PathParam("W") long W, @PathParam("emails") List<PathSegment> emails) throws Exception {
+    @Path("room/bypersonandtime/{Q}/{W}/{ids: .*}/")
+    public String getRoomByPersonAndTime(@PathParam("Q") long Q, @PathParam("W") long W, @PathParam("ids") List<PathSegment> ids) throws Exception {
         Set<Person> personGroup = new HashSet<>();
-        for (PathSegment email: emails) {
-            personGroup.add(dao.getPersonByEmail(email.getPath()));
+        for (PathSegment id: ids) {
+            Person p = dao.getPerson(Long.getLong(id.getPath()));
+            if(p == null) return "[]";
+            personGroup.add(p);
         }
-        if(personGroup.size() != emails.size()) return "[]";
+        if(personGroup.size() < 2 || personGroup.size() != ids.size()) return "[]";
         
         String returnJson = "[";
         for (Person p: personGroup){
-            Set<HasA> hasASet = dao.getHasAByPerson(p.getPersonID());
-            Set<Device> deviceSet = new HashSet<>();
-            for (HasA h : hasASet) {
-                deviceSet.add(dao.getDevice(h.getDeviceID()));
+            Set<Device> deviceSet;
+            if(MODE == 0){
+                deviceSet = dao.getThingsByPerson(p.getPersonID());
+            }else{
+                deviceSet = dao.getMHubsByPerson(p.getPersonID());
             }
 
-            Set<Rendezvous> rendezvousSet = null;
+            Set<Rendezvous> rendezvousSet;
             for (Device d : deviceSet) {
                 if(MODE == 0){
-                    rendezvousSet = getDurationByMHub(d.getMhubID(), Q, W);   //duration/thing/{thingID}/{W}/{delta}
-                }else if(MODE == 1){
-                    rendezvousSet = getDurationByThing(d.getThingID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
+                    rendezvousSet = getDurationByMHub(d.getUuID(), Q, W);   //duration/thing/{thingID}/{W}/{delta}
+                }else{
+                    rendezvousSet = getDurationByThing(d.getUuID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
                 }
                 if(rendezvousSet == null) return "[]";
                 for (Rendezvous re: rendezvousSet) {
-                    Device d2 = null;
+                    Room r;
                     if(MODE == 0){
-                        d2 = dao.getDeviceByThing(re.getThingID());
-                    }else if(MODE == 1){
-                        d2 = dao.getDeviceByMHub(re.getMhubID());
+                        r = dao.getRoomByThing(re.getThingID());
+                    }else{
+                        r = dao.getRoomByMHub(re.getMhubID());
                     }
-                    HasA h = dao.getHasAByDevice(d2.getDeviceID());
-                    Room r = dao.getRoom(h.getRoomID());
                     
                     returnJson += "{\"name\": \"" + p.getPersonName() + "\", "
                         + "\"room\": \"" + r.getRoomName() + "\", ";

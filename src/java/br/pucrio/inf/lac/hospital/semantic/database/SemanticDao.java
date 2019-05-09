@@ -9,7 +9,7 @@ import br.pucrio.inf.lac.hospital.semantic.data.MHub;
 import br.pucrio.inf.lac.hospital.semantic.data.Person;
 import br.pucrio.inf.lac.hospital.semantic.data.Room;
 import br.pucrio.inf.lac.hospital.semantic.data.Section;
-import br.pucrio.inf.lac.hospital.semantic.data.Thing;
+//import br.pucrio.inf.lac.hospital.semantic.data.Thing;
 import java.util.Set;
 import java.util.UUID;
 
@@ -108,6 +108,20 @@ public interface SemanticDao {
     public Set<Device> getMHubsByRoom(long roomID);
     
     /**
+     * Gets all the Things located with a specific Person
+     * @param personID the id of the Person
+     * @return A Set of Devices
+     */
+    public Set<Device> getThingsByPerson(long personID);
+    
+    /**
+     * Gets all the MHubs located with a specific Person
+     * @param personID the id of the Person
+     * @return A Set of Devices
+     */
+    public Set<Device> getMHubsByPerson(long personID);
+    
+    /**
      * Gets a specific HasA (Devices+Persons+Rooms) with a specific Device
      * @param deviceID the id of the Device
      * @return the HasA containing the Devices, Persons and Rooms
@@ -183,6 +197,20 @@ public interface SemanticDao {
      * @return the Person
      */
     public Person getPersonByThing(UUID thingID);
+    
+    /**
+     * Gets a specific Room
+     * @param mhubID the id of the MHub
+     * @return the Room
+     */
+    public Room getRoomByMHub(UUID mhubID);
+    
+    /**
+     * Gets a specific Room
+     * @param thingID the id of the Thing
+     * @return the Room
+     */
+    public Room getRoomByThing(UUID thingID);
     
 }
 

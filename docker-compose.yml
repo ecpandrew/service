@@ -1,0 +1,11 @@
+version: '3.6'
+# File Author: Daniel Carvalho
+
+services:
+  service:
+    # build will get tagged with 'image'
+    build: .
+    image: service
+    container_name: service
+    ports:
+      - 5001:8080

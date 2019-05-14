@@ -119,7 +119,7 @@ public class SemanticResource {
                 + "  \"sectionName\" : \"LSDi\",\n"
                 + "  \"buildingName\" : \"Prédio da Pós\",\n"
                 + "  \"cityName\" : \"São Luís\",\n"
-                + "  \"duration\" : 3600, //Em segundos\n"
+                + "  \"duration\" : 3600\n"
                 + "}";
     }
     

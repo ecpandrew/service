@@ -2,7 +2,7 @@
 # Dockerfile to build Service container images
 # Based on GlassFish 4.1 image
 # File Author: Daniel Carvalho
-# docker run --name service -tid -p 8080:8080 service
+# docker run --name service -tid -p 5001:8080 service
 ############################################################
 
 ################ Service BEGIN INSTALLATION ################

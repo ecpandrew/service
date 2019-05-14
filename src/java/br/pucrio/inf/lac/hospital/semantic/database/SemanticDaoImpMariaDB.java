@@ -34,7 +34,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     private final String semantic = "http://localhost:8080/api/";
     
     public SemanticDaoImpMariaDB(){
-        connectToDB();
+        //connectToDB();
     }
     
     public void connectToDB(){

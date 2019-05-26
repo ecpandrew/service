@@ -2,16 +2,13 @@ package br.pucrio.inf.lac.hospital.semantic.wscore;
 
 //import br.pucrio.inf.lac.hospital.horys.protocol.HORYSProtocol;
 //import br.pucrio.inf.lac.hospital.semantic.data.Beacon;
-//import br.pucrio.inf.lac.hospital.semantic.data.Building;
-//import br.pucrio.inf.lac.hospital.semantic.data.City;
 import br.pucrio.inf.lac.hospital.semantic.data.Device;
 import br.pucrio.inf.lac.hospital.semantic.data.GroupRendezvous;
 //import br.pucrio.inf.lac.hospital.semantic.data.HasA;
 //import br.pucrio.inf.lac.hospital.semantic.data.MHub;
 import br.pucrio.inf.lac.hospital.semantic.data.Person;
 import br.pucrio.inf.lac.hospital.semantic.data.Rendezvous;
-import br.pucrio.inf.lac.hospital.semantic.data.Room;
-//import br.pucrio.inf.lac.hospital.semantic.data.Section;
+import br.pucrio.inf.lac.hospital.semantic.data.PhysicalSpace;
 //import br.pucrio.inf.lac.hospital.semantic.data.Thing;
 import br.pucrio.inf.lac.hospital.semantic.database.SemanticDao;
 import br.pucrio.inf.lac.hospital.semantic.database.SemanticDaoImpMariaDB;
@@ -49,7 +46,7 @@ import javax.ws.rs.core.PathSegment;
  * REST Web Service
  *
  */
-@Path("get")
+@Path("/")
 public class SemanticResource {
 
     private static SemanticDao dao = new SemanticDaoImpMariaDB();
@@ -57,7 +54,7 @@ public class SemanticResource {
     private ObjectMapper mapper;
     
     /** The  Horys restport. */
-    private final String HORYS = "http://localhost:7981";
+    private final String HORYS = "http://horys:5000";
     private final String sHORYS = "http://localhost:8080/service/webresources/simulatedhoriz";
     
     /** The Service Mode: */
@@ -126,8 +123,8 @@ public class SemanticResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("person/byroom/{roomID}/")
-    public String getPersonByRoom(@PathParam("roomID") long roomID) throws Exception {
-        Room r = dao.getRoom(roomID);
+    public String getPersonByPhysicalSpace(@PathParam("roomID") long roomID) throws Exception {
+        PhysicalSpace r = dao.getPhysicalSpace(roomID);
         if(r == null) return "[]";
         //Set<HasA> hasASet = dao.getHasAByRoom(r.getRoomID());
         Set<Device> deviceSet;
@@ -158,7 +155,7 @@ public class SemanticResource {
                 }
                 //HasA h = dao.getHasAByDevice(d2.getDeviceID());
                 //Person p = dao.getPerson(h.getPersonID());
-                returnJson += "{\"name\": \"" + p.getPersonName() + "\", "
+                returnJson += "{\"name\": \"" + p.getShortName() + "\", "
                         + "\"email\": \"" + p.getPersonEmail() + "\", ";
 
                 if(MODE == 0){
@@ -179,8 +176,8 @@ public class SemanticResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("person/byroomandtime/{roomID}/{Q}/{W}/")
-    public String getPersonByRoomAndTime(@PathParam("roomID") long roomID, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
-        Room r = dao.getRoom(roomID);
+    public String getPersonByPhysicalSpaceAndTime(@PathParam("roomID") long roomID, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
+        PhysicalSpace r = dao.getPhysicalSpace(roomID);
         if(r == null) return "[]";
         //Set<HasA> hasASet = dao.getHasAByRoom(r.getRoomID());
         Set<Device> deviceSet;
@@ -211,7 +208,7 @@ public class SemanticResource {
                 }
                 //HasA h = dao.getHasAByDevice(d2.getDeviceID());
                 //Person p = dao.getPerson(h.getPersonID());
-                returnJson += "{\"name\": \"" + p.getPersonName() + "\", "
+                returnJson += "{\"name\": \"" + p.getShortName() + "\", "
                         + "\"email\": \"" + p.getPersonEmail() + "\", ";
                 
                 if(MODE == 0){
@@ -262,14 +259,14 @@ public class SemanticResource {
                 }
                 if(rendezvousSet == null) return "[]";
                 for (Rendezvous re: rendezvousSet) {
-                    Room r;
+                    PhysicalSpace r;
                     if(MODE == 0){
-                        r = dao.getRoomByThing(re.getThingID());
+                        r = dao.getPhysicalSpaceByThing(re.getThingID());
                     }else{
-                        r = dao.getRoomByMHub(re.getMhubID());
+                        r = dao.getPhysicalSpaceByMHub(re.getMhubID());
                     }
                     
-                    reSet.add(new Rendezvous(p.getPersonName(), r.getRoomName(), re.getArrive(), re.getDepart()));
+                    reSet.add(new Rendezvous(p.getShortName(), r.getRoomName(), re.getArrive(), re.getDepart()));
                 }
             }
         }
@@ -319,7 +316,7 @@ public class SemanticResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("room/byperson/{ids: .*}/")
-    public String getRoomByPerson(@PathParam("ids") List<PathSegment> ids) throws Exception {
+    public String getPhysicalSpaceByPerson(@PathParam("ids") List<PathSegment> ids) throws Exception {
         Set<Person> personGroup = new HashSet<>();
         for (PathSegment id: ids) {
             Person p = dao.getPerson(Long.getLong(id.getPath()));
@@ -347,14 +344,14 @@ public class SemanticResource {
                 }
                 if(rendezvousSet == null) return "[]";
                 for (Rendezvous re: rendezvousSet) {
-                    Room r;
+                    PhysicalSpace r;
                     if(MODE == 0){
-                        r = dao.getRoomByThing(re.getThingID());
+                        r = dao.getPhysicalSpaceByThing(re.getThingID());
                     }else{
-                        r = dao.getRoomByMHub(re.getMhubID());
+                        r = dao.getPhysicalSpaceByMHub(re.getMhubID());
                     }
                     
-                    returnJson += "{\"name\": \"" + p.getPersonName() + "\", "
+                    returnJson += "{\"name\": \"" + p.getShortName() + "\", "
                         + "\"room\": \"" + r.getRoomName() + "\", ";
                     if(MODE == 0){
                         returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
@@ -374,7 +371,7 @@ public class SemanticResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("room/bypersonandtime/{Q}/{W}/{ids: .*}/")
-    public String getRoomByPersonAndTime(@PathParam("Q") long Q, @PathParam("W") long W, @PathParam("ids") List<PathSegment> ids) throws Exception {
+    public String getPhysicalSpaceByPersonAndTime(@PathParam("Q") long Q, @PathParam("W") long W, @PathParam("ids") List<PathSegment> ids) throws Exception {
         Set<Person> personGroup = new HashSet<>();
         for (PathSegment id: ids) {
             Person p = dao.getPerson(Long.getLong(id.getPath()));
@@ -401,14 +398,14 @@ public class SemanticResource {
                 }
                 if(rendezvousSet == null) return "[]";
                 for (Rendezvous re: rendezvousSet) {
-                    Room r;
+                    PhysicalSpace r;
                     if(MODE == 0){
-                        r = dao.getRoomByThing(re.getThingID());
+                        r = dao.getPhysicalSpaceByThing(re.getThingID());
                     }else{
-                        r = dao.getRoomByMHub(re.getMhubID());
+                        r = dao.getPhysicalSpaceByMHub(re.getMhubID());
                     }
                     
-                    returnJson += "{\"name\": \"" + p.getPersonName() + "\", "
+                    returnJson += "{\"name\": \"" + p.getShortName() + "\", "
                         + "\"room\": \"" + r.getRoomName() + "\", ";
                     if(MODE == 0){
                         returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";

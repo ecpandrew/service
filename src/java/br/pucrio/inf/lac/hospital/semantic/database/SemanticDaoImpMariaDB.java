@@ -1,14 +1,11 @@
 package br.pucrio.inf.lac.hospital.semantic.database;
 
 import br.pucrio.inf.lac.hospital.semantic.data.Beacon;
-import br.pucrio.inf.lac.hospital.semantic.data.Building;
-import br.pucrio.inf.lac.hospital.semantic.data.City;
 import br.pucrio.inf.lac.hospital.semantic.data.Device;
 import br.pucrio.inf.lac.hospital.semantic.data.HasA;
 import br.pucrio.inf.lac.hospital.semantic.data.MHub;
 import br.pucrio.inf.lac.hospital.semantic.data.Person;
-import br.pucrio.inf.lac.hospital.semantic.data.Room;
-import br.pucrio.inf.lac.hospital.semantic.data.Section;
+import br.pucrio.inf.lac.hospital.semantic.data.PhysicalSpace;
 import br.pucrio.inf.lac.hospital.semantic.data.Thing;
 import br.pucrio.inf.lac.hospital.semantic.wscore.REST;
 import java.sql.Connection;
@@ -31,7 +28,7 @@ import org.json.JSONObject;
 
 public class SemanticDaoImpMariaDB implements SemanticDao{
     private Connection conn;
-    private final String semantic = "http://localhost:8080/api/";
+    private final String semantic = "http://semantic-server:5002/api/";
     
     public SemanticDaoImpMariaDB(){
         //connectToDB();
@@ -191,26 +188,6 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         sql += (b.isActive()) ?"TRUE)" :"FALSE)";
         return processInsert(sql, "thingID");
     }
-    
-
-    @Override
-    public long insertBuilding(Building b) {
-        String sql = "INSERT INTO Building (buildingID, buildingName, "
-                   + "cityID) VALUES ("
-                   + b.getBuildingID()+", \'"
-                   + b.getBuildingName()+"\', "
-                   + b.getCityID()+")";
-        return processInsert(sql, "buildingID");
-    }
-
-    @Override
-    public long insertCity(City c) {
-        String sql = "INSERT INTO City (cityID, cityName) "
-                   + "VALUES ("
-                   + c.getCityID()+", \'"
-                   + c.getCityName()+"\')";
-        return processInsert(sql, "cityID");
-    }
 
     @Override
     public long insertDevice(Device d) {
@@ -246,27 +223,18 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     public long insertPerson(Person p) {
         String sql = "INSERT INTO Person (personID, personName, personEmail) "
                    + "VALUES ("+p.getPersonID()+", \'"
-                   + p.getPersonName()+"\', \'"
+                   + p.getShortName()+"\', \'"
                    + p.getPersonEmail()+"\')";
         return processInsert(sql, "personID");
     }
 
     @Override
-    public long insertRoom(Room r) {
+    public long insertPhysicalSpace(PhysicalSpace r) {
         String sql = "INSERT INTO Room (roomID, roomName, sectionID) "
                    + "VALUES ("+r.getRoomID()+", \'"
                    + r.getRoomName()+"\', "
                    + r.getSectionID()+")";
         return processInsert(sql, "roomID");
-    }
-
-    @Override
-    public long insertSection(Section s) {
-        String sql = "INSERT INTO Section(sectionID, sectionName, buildingID) "
-                   + "VALUES ("+s.getSectionID()+", \'"
-                   + s.getSectionName()+"\', "
-                   + s.getBuildingID()+")";
-        return processInsert(sql, "sectionID");
     }
     
     @Override
@@ -320,16 +288,9 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
 
     @Override
-    public boolean deleteRoom(long roomID) {
+    public boolean deletePhysicalSpace(long roomID) {
         String sql = "DELETE FROM Room "
                    + "WHERE roomID = "+roomID;
-        return (processUpdate(sql)>0);
-    }
-
-    @Override
-    public boolean deleteSection(long sectionID) {
-        String sql = "DELETE FROM Section "
-                   + "WHERE sectionID = "+sectionID;
         return (processUpdate(sql)>0);
     }
     
@@ -339,23 +300,6 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                    + "SET active = ";
         sql += (b.isActive()) ?"TRUE " :"FALSE ";
         sql += "WHERE thingID = "+b.getThingID();
-        return (processUpdate(sql)>0);
-    }
-    
-    @Override
-    public boolean updateBuilding(Building b) {
-        String sql = "UPDATE Building "
-                   + "SET buildingName = \'"+b.getBuildingName()+"\', "
-                   + "cityID = "+b.getCityID()+" "
-                   + "WHERE buildingID = "+b.getBuildingID();
-        return (processUpdate(sql)>0);
-    }
-
-    @Override
-    public boolean updateCity(City c) {
-        String sql = "UPDATE City "
-                   + "SET cityName = \'"+c.getCityName()+"\' "
-                   + "WHERE cityID = "+c.getCityID();
         return (processUpdate(sql)>0);
     }
     
@@ -391,25 +335,17 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     @Override
     public boolean updatePerson(Person p) {
         String sql = "UPDATE Person "
-                   + "SET name = \'"+p.getPersonName()+"\', "
+                   + "SET name = \'"+p.getShortName()+"\', "
                    + "email = \'"+p.getPersonEmail()+"\' "
                    + "WHERE persomID = "+p.getPersonID();
         return (processUpdate(sql)>0);
     }
 
     @Override
-    public boolean updateRoom(Room r) {
+    public boolean updatePhysicalSpace(PhysicalSpace r) {
         String sql = "UPDATE Room "
                    + "SET roomName = \'"+r.getRoomName()+"\' "
                    + "WHERE roomID = "+r.getRoomID();
-        return (processUpdate(sql)>0);
-    }
-
-    @Override
-    public boolean updateSection(Section s) {
-        String sql = "UPDATE Section "
-                   + "SET sectionName = \'"+s.getSectionName()+"\' "
-                   + "WHERE sectionID = "+s.getSectionID();
         return (processUpdate(sql)>0);
     }
 
@@ -428,46 +364,6 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
             Beacon b = new Beacon(UUID.fromString(resulti.get("thingID")),
                     ("1".equals(resulti.get("active"))));
             resultSet.add(b);
-        }
-        return resultSet;
-    }
-
-    @Override
-    public Set<Building> getBuildings() {
-        HashSet<Building> resultSet = new HashSet<>();
-        String sql = "SELECT * FROM Building";
-
-        HashSet<String> columnName = new HashSet<>();
-        columnName.add("buildinglID");
-        columnName.add("buildingName");
-        columnName.add("cityID");
-
-        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
-
-        for (Map<String, String> resulti : selectResult) {
-            Building b = new Building(Long.parseLong(resulti.get("buildingID")),
-                    resulti.get("buildingName"),
-                    Long.parseLong(resulti.get("cityID")));
-            resultSet.add(b);
-        }
-        return resultSet;
-    }
-
-    @Override
-    public Set<City> getCities() {
-        HashSet<City> resultSet = new HashSet<>();
-        String sql = "SELECT * FROM City";
-
-        HashSet<String> columnName = new HashSet<>();
-        columnName.add("cityID");
-        columnName.add("cityName");
-
-        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
-
-        for (Map<String, String> resulti : selectResult) {
-            City c = new City(Long.parseLong(resulti.get("cityID")),
-                    resulti.get("cityName"));
-            resultSet.add(c);
         }
         return resultSet;
     }
@@ -559,8 +455,8 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
 
     @Override
-    public Set<Room> getRooms() {
-        HashSet<Room> resultSet = new HashSet<>();
+    public Set<PhysicalSpace> getPhysicalSpaces() {
+        HashSet<PhysicalSpace> resultSet = new HashSet<>();
         String sql = "SELECT * FROM Room";
 
         HashSet<String> columnName = new HashSet<>();
@@ -571,43 +467,22 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
 
         for (Map<String, String> resulti : selectResult) {
-            Room r = new Room(Long.parseLong(resulti.get("roomID")),
+            PhysicalSpace r = new PhysicalSpace(Long.parseLong(resulti.get("roomID")),
                     resulti.get("roomName"),
                     Long.parseLong(resulti.get("sectionID")));
             resultSet.add(r);
         }
         return resultSet;
     }
-
-    @Override
-    public Set<Section> getSections() {
-        HashSet<Section> resultSet = new HashSet<>();
-        String sql = "SELECT * FROM Section";
-
-        HashSet<String> columnName = new HashSet<>();
-        columnName.add("sectionID");
-        columnName.add("sectionName");
-        columnName.add("buildingID");
-
-        LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
-
-        for (Map<String, String> resulti : selectResult) {
-            Section s = new Section(Long.parseLong(resulti.get("sectionID")),
-                    resulti.get("sectionName"),
-                    Long.parseLong(resulti.get("buildingID")));
-            resultSet.add(s);
-        }
-        return resultSet;
-    }
     
     @Override
-    public Room getRoom(long roomID) {
+    public PhysicalSpace getPhysicalSpace(long roomID) {
         String url;
         String returnedJson;
         JSONArray data = null;
-        Room r = null;
+        PhysicalSpace r = null;
         
-        url = semantic+ "rooms/"+roomID;
+        url = semantic+ "physical_spaces/"+roomID;
         try {
             returnedJson = REST.sendGet(url, "GET");
             data = new JSONArray(returnedJson);
@@ -615,9 +490,9 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
             if(data.length() != 0){
                 JSONObject text = data.getJSONObject(0);
 
-                r = new Room(roomID,
-                        text.getString("roomName"),
-                        text.getLong("sectionID"));
+                r = new PhysicalSpace(roomID,
+                        text.getString("name"),
+                        text.getString("description"));
             }
         } catch (Exception ex) {
             Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
@@ -626,7 +501,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
     
     @Override
-    public Room getRoomByName(String room) {
+    public PhysicalSpace getPhysicalSpaceByName(String room) {
         String sql = "SELECT * FROM Room "
                    + "WHERE roomName = \'"+room+"\'";
 
@@ -636,9 +511,9 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         columnName.add("sectionID");
 
         LinkedList<Map<String, String>> selectResult = processSelectQuery(sql, columnName);
-        Room r = null;
+        PhysicalSpace r = null;
         for (Map<String, String> resulti : selectResult) {
-            r = new Room(Long.parseLong(resulti.get("roomID")),
+            r = new PhysicalSpace(Long.parseLong(resulti.get("roomID")),
                     resulti.get("roomName"),
                     Long.parseLong(resulti.get("sectionID")));
         }
@@ -652,9 +527,9 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         String url;
         String returnedJson;
         JSONArray data;
-        Room r = null;
+        PhysicalSpace r = null;
         
-        url = semantic+ "rooms/"+roomID+"/things";
+        url = semantic+ "physical_spaces/"+roomID+"/things";
         try {
             returnedJson = REST.sendGet(url, "GET");
             data = new JSONArray(returnedJson);
@@ -680,9 +555,9 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         String url;
         String returnedJson;
         JSONArray data;
-        Room r = null;
+        PhysicalSpace r = null;
         
-        url = semantic+ "rooms/"+roomID+"/mhubs";
+        url = semantic+ "physical_spaces/"+roomID+"/mhubs";
         try {
             returnedJson = REST.sendGet(url, "GET");
             data = new JSONArray(returnedJson);
@@ -708,9 +583,9 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         String url;
         String returnedJson;
         JSONArray data;
-        Room r = null;
+        PhysicalSpace r = null;
         
-        url = semantic+ "users/"+personID+"/things";
+        url = semantic+ "persons/"+personID+"/things";
         try {
             returnedJson = REST.sendGet(url, "GET");
             data = new JSONArray(returnedJson);
@@ -736,9 +611,9 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         String url;
         String returnedJson;
         JSONArray data;
-        Room r = null;
+        PhysicalSpace r = null;
         
-        url = semantic+ "users/"+personID+"/mhubs";
+        url = semantic+ "persons/"+personID+"/mhubs";
         try {
             returnedJson = REST.sendGet(url, "GET");
             data = new JSONArray(returnedJson);
@@ -918,7 +793,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         JSONArray data;
         Person p = null;
         
-        url = semantic+ "users/"+personID;
+        url = semantic+ "persons/"+personID;
         try {
             returnedJson = REST.sendGet(url, "GET");
             data = new JSONArray(returnedJson);
@@ -927,7 +802,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 JSONObject text = data.getJSONObject(0);
 
                 p = new Person(personID,
-                        text.getString("name"),
+                        text.getString("shortName"),
                         text.getString("email"));
             }
         } catch (Exception ex) {
@@ -973,15 +848,15 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 JSONArray data2 = text.getJSONArray("holder");
                 JSONObject text2 = data2.getJSONObject(0);
                 
-                url = semantic+"users/"+text2.getString("id");
+                url = semantic+"persons/"+text2.getString("id");
                 
                 returnedJson = REST.sendGet(url, "GET");
                 data = new JSONArray(returnedJson);
                 if(data.length() != 0){
                 text = data.getJSONObject(0);
                 
-                p = new Person(text.getLong("id"),
-                        text.getString("name"),
+                p = new Person(text2.getLong("id"),
+                        text.getString("shortName"),
                         text.getString("email"));
                 }
             }
@@ -1008,15 +883,15 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 JSONArray data2 = text.getJSONArray("holder");
                 JSONObject text2 = data2.getJSONObject(0);
                 
-                url = semantic+"users/"+text2.getString("id");
+                url = semantic+"persons/"+text2.getString("id");
                 
                 returnedJson = REST.sendGet(url, "GET");
                 data = new JSONArray(returnedJson);
                 if(data.length() != 0){
                 text = data.getJSONObject(0);
                 
-                p = new Person(text.getLong("id"),
-                        text.getString("name"),
+                p = new Person(text2.getLong("id"),
+                        text.getString("shortName"),
                         text.getString("email"));
                 }
             }
@@ -1027,11 +902,11 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
     
     @Override
-    public Room getRoomByMHub(UUID mhubID) {
+    public PhysicalSpace getPhysicalSpaceByMHub(UUID mhubID) {
         String url;
         String returnedJson;
         JSONArray data;
-        Room r = null;
+        PhysicalSpace r = null;
         
         url = semantic+ "mhubs/"+mhubID;
         try {
@@ -1043,16 +918,16 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 JSONArray data2 = text.getJSONArray("holder");
                 JSONObject text2 = data2.getJSONObject(0);
                 
-                url = semantic+"users/"+text2.getString("id");
+                url = semantic+"persons/"+text2.getString("id");
                 
                 returnedJson = REST.sendGet(url, "GET");
                 data = new JSONArray(returnedJson);
                 if(data.length() != 0){
                 text = data.getJSONObject(0);
                 
-                r = new Room(text.getLong("id"),
-                        text.getString("name"),
-                        text.getLong("section"));
+                r = new PhysicalSpace(text2.getLong("id"),
+                        text.getString("shortName"),
+                        text.getString("description"));
                 }
             }
         } catch (Exception ex) {
@@ -1062,11 +937,11 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     }
     
     @Override
-    public Room getRoomByThing(UUID thingID) {
+    public PhysicalSpace getPhysicalSpaceByThing(UUID thingID) {
         String url;
         String returnedJson;
         JSONArray data;
-        Room r = null;
+        PhysicalSpace r = null;
         
         url = semantic+ "things/"+thingID;
         try {
@@ -1078,16 +953,16 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 JSONArray data2 = text.getJSONArray("holder");
                 JSONObject text2 = data2.getJSONObject(0);
                 
-                url = semantic+"users/"+text2.getString("id");
+                url = semantic+"persons/"+text2.getString("id");
                 
                 returnedJson = REST.sendGet(url, "GET");
                 data = new JSONArray(returnedJson);
                 if(data.length() != 0){
                 text = data.getJSONObject(0);
                 
-                r = new Room(text.getLong("id"),
-                        text.getString("name"),
-                        text.getLong("section"));
+                r = new PhysicalSpace(text2.getLong("id"),
+                        text.getString("shortName"),
+                        text.getString("description"));
                 }
             }
         } catch (Exception ex) {

@@ -3,16 +3,24 @@ package br.pucrio.inf.lac.hospital.semantic.data;
 public class Person {
 
     private long personID;
-    private String personName;
+    private String shortName;
     private String personEmail;
+    private String fullName;
 
     public Person() {
     }
 
-    public Person(long personID, String personName, String personEmail) {
+    public Person(long personID, String shortName, String personEmail) {
         this.personID = personID;
-        this.personName = personName;
+        this.shortName = shortName;
         this.personEmail = personEmail;
+    }
+    
+    public Person(long personID, String shortName, String personEmail, String fullName) {
+        this.personID = personID;
+        this.shortName = shortName;
+        this.personEmail = personEmail;
+        this.fullName = fullName;
     }
 
     public long getPersonID() {
@@ -23,12 +31,12 @@ public class Person {
         this.personID = personID;
     }
 
-    public String getPersonName() {
-        return personName;
+    public String getShortName() {
+        return shortName;
     }
 
-    public void setPersonName(String personName) {
-        this.personName = personName;
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 
     public String getPersonEmail() {
@@ -39,9 +47,17 @@ public class Person {
         this.personEmail = personEmail;
     }
     
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+    
     @Override
     public String toString() {
-        return "Person{" + "personID=" + personID + ", personName=" + personName + ", personEmail=" + personEmail + '}';
+        return "Person{" + "personID=" + personID + ", shortName=" + shortName + ", personEmail=" + personEmail + '}';
     }
     
 }

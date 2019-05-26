@@ -1,15 +1,22 @@
 package br.pucrio.inf.lac.hospital.semantic.data;
 
-public class Room {
+public class PhysicalSpace {
 
     private long roomID;
     private String roomName;
+    private String roomDescription;
     private long sectionID;
 
-    public Room() {
+    public PhysicalSpace() {
+    }
+    
+    public PhysicalSpace(long roomID, String roomName, String roomDescription) {
+        this.roomID = roomID;
+        this.roomName = roomName;
+        this.roomDescription = roomDescription;
     }
 
-    public Room(long roomID, String roomName, long sectionID) {
+    public PhysicalSpace(long roomID, String roomName, long sectionID) {
         this.roomID = roomID;
         this.roomName = roomName;
         this.sectionID = sectionID;
@@ -37,6 +44,14 @@ public class Room {
 
     public void setSectionID(long sectionID) {
         this.sectionID = sectionID;
+    }
+    
+    public String getRoomDescription() {
+        return roomDescription;
+    }
+
+    public void setRoomDescription(String roomDescription) {
+        this.roomDescription = roomDescription;
     }
     
     @Override

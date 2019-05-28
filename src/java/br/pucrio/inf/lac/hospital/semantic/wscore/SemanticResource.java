@@ -236,7 +236,7 @@ public class SemanticResource {
         Set<Rendezvous> reSet = new HashSet<>();
         ArrayList<GroupRendezvous> gReSet = new ArrayList<>();
         for (PathSegment id: ids) {
-            Person p = dao.getPerson(Long.getLong(id.getPath()));
+            Person p = dao.getPerson(Long.parseLong(id.getPath()));
             if(p == null) return "[]";
             personGroup.add(p);
         }
@@ -319,7 +319,7 @@ public class SemanticResource {
     public String getPhysicalSpaceByPerson(@PathParam("ids") List<PathSegment> ids) throws Exception {
         Set<Person> personGroup = new HashSet<>();
         for (PathSegment id: ids) {
-            Person p = dao.getPerson(Long.getLong(id.getPath()));
+            Person p = dao.getPerson(Long.parseLong(id.getPath()));
             if(p == null) return "[]";
             personGroup.add(p);
         }
@@ -371,10 +371,10 @@ public class SemanticResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("persons/{ids: .*}/physical_spaces/{Q}/{W}/")
-    public String getPhysicalSpaceByPersonAndTime(@PathParam("Q") long Q, @PathParam("W") long W, @PathParam("ids") List<PathSegment> ids) throws Exception {
+    public String getPhysicalSpaceByPersonAndTime(@PathParam("ids") List<PathSegment> ids, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
         Set<Person> personGroup = new HashSet<>();
         for (PathSegment id: ids) {
-            Person p = dao.getPerson(Long.getLong(id.getPath()));
+            Person p = dao.getPerson(Long.parseLong(id.getPath()));
             if(p == null) return "[]";
             personGroup.add(p);
         }

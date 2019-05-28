@@ -28,7 +28,7 @@ import org.json.JSONObject;
 
 public class SemanticDaoImpMariaDB implements SemanticDao{
     private Connection conn;
-    private final String semantic = "http://semantic-server:5002/api/";
+    private final String semantic = "http://smartlab.lsdi.ufma.br/semantic/api/";
     
     public SemanticDaoImpMariaDB(){
         //connectToDB();

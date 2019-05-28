@@ -54,7 +54,7 @@ public class SemanticResource {
     private ObjectMapper mapper;
     
     /** The  Horys restport. */
-    private final String HORYS = "http://horys:5000";
+    private final String HORYS = "http://smartlab.lsdi.ufma.br/horys";
     private final String sHORYS = "http://localhost:8080/service/webresources/simulatedhoriz";
     
     /** The Service Mode: */

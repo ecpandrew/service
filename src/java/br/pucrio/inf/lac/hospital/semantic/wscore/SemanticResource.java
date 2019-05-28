@@ -295,6 +295,7 @@ public class SemanticResource {
                 }
             }
         }
+        if(gReSet == null) return "[]";
 
         String returnJson = "[";
         //String returnJson = "{ "

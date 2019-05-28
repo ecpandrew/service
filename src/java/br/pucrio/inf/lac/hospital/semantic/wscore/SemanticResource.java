@@ -155,6 +155,8 @@ public class SemanticResource {
                 }
                 //HasA h = dao.getHasAByDevice(d2.getDeviceID());
                 //Person p = dao.getPerson(h.getPersonID());
+                if(p == null) return "[]";
+                
                 returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
                         + "\"email\": \"" + p.getPersonEmail() + "\", ";
 
@@ -208,6 +210,8 @@ public class SemanticResource {
                 }
                 //HasA h = dao.getHasAByDevice(d2.getDeviceID());
                 //Person p = dao.getPerson(h.getPersonID());
+                if(p == null) return "[]";
+                
                 returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
                         + "\"email\": \"" + p.getPersonEmail() + "\", ";
                 
@@ -245,9 +249,9 @@ public class SemanticResource {
             //Set<HasA> hasASet = dao.getHasAByPerson(p.getPersonID());
             Set<Device> deviceSet;
             if(MODE == 0){
-                deviceSet = dao.getThingsByPerson(p.getPersonID());
-            }else{
                 deviceSet = dao.getMHubsByPerson(p.getPersonID());
+            }else{
+                deviceSet = dao.getThingsByPerson(p.getPersonID());
             }
 
             Set<Rendezvous> rendezvousSet;
@@ -323,16 +327,16 @@ public class SemanticResource {
             if(p == null) return "[]";
             personGroup.add(p);
         }
-        if(personGroup.size() < 2 || personGroup.size() != ids.size()) return "[]";
+        //if(personGroup.size() < 2 || personGroup.size() != ids.size()) return "[]";
         
         String returnJson = "[";
         for (Person p: personGroup){
             //Set<HasA> hasASet = dao.getHasAByPerson(p.getPersonID());
             Set<Device> deviceSet;
             if(MODE == 0){
-                deviceSet = dao.getThingsByPerson(p.getPersonID());
-            }else{
                 deviceSet = dao.getMHubsByPerson(p.getPersonID());
+            }else{
+                deviceSet = dao.getThingsByPerson(p.getPersonID());
             }
 
             Set<Rendezvous> rendezvousSet;
@@ -350,6 +354,7 @@ public class SemanticResource {
                     }else{
                         r = dao.getPhysicalSpaceByMHub(re.getMhubID());
                     }
+                    if(r == null) return "[]";
                     
                     returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
                         + "\"physical_space\": \"" + r.getRoomName() + "\", ";
@@ -378,15 +383,15 @@ public class SemanticResource {
             if(p == null) return "[]";
             personGroup.add(p);
         }
-        if(personGroup.size() < 2 || personGroup.size() != ids.size()) return "[]";
+        //if(personGroup.size() < 2 || personGroup.size() != ids.size()) return "[]";
         
         String returnJson = "[";
         for (Person p: personGroup){
             Set<Device> deviceSet;
             if(MODE == 0){
-                deviceSet = dao.getThingsByPerson(p.getPersonID());
-            }else{
                 deviceSet = dao.getMHubsByPerson(p.getPersonID());
+            }else{
+                deviceSet = dao.getThingsByPerson(p.getPersonID());
             }
 
             Set<Rendezvous> rendezvousSet;
@@ -404,6 +409,7 @@ public class SemanticResource {
                     }else{
                         r = dao.getPhysicalSpaceByMHub(re.getMhubID());
                     }
+                    if(r == null) return "[]";
                     
                     returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
                         + "\"physical_space\": \"" + r.getRoomName() + "\", ";

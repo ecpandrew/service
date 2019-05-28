@@ -479,20 +479,21 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     public PhysicalSpace getPhysicalSpace(long roomID) {
         String url;
         String returnedJson;
-        JSONArray data = null;
+        JSONObject data = null;
         PhysicalSpace r = null;
         
         url = semantic+ "physical_spaces/"+roomID;
         try {
             returnedJson = REST.sendGet(url, "GET");
-            data = new JSONArray(returnedJson);
+            //data = new JSONArray(returnedJson);
+            data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
-                JSONObject text = data.getJSONObject(0);
+                //text = new JSONObject(returnedJson);
 
                 r = new PhysicalSpace(roomID,
-                        text.getString("name"),
-                        text.getString("description"));
+                        data.getString("name"),
+                        data.getString("description"));
             }
         } catch (Exception ex) {
             Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
@@ -526,19 +527,19 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         
         String url;
         String returnedJson;
-        JSONArray data;
+        JSONObject data;
         PhysicalSpace r = null;
         
         url = semantic+ "physical_spaces/"+roomID+"/things";
         try {
             returnedJson = REST.sendGet(url, "GET");
-            data = new JSONArray(returnedJson);
+            data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
-                JSONObject text = data.getJSONObject(0);
+                //JSONObject text = data.getJSONObject(0);
 
-                Device d = new Thing(UUID.fromString(text.getString("UUID")),
-                                  text.getString("description"));
+                Device d = new Thing(UUID.fromString(data.getString("uuid")),
+                                  data.getString("description"));
                 resultSet.add(d);
             }
         } catch (Exception ex) {
@@ -554,19 +555,19 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         
         String url;
         String returnedJson;
-        JSONArray data;
+        JSONObject data;
         PhysicalSpace r = null;
         
         url = semantic+ "physical_spaces/"+roomID+"/mhubs";
         try {
             returnedJson = REST.sendGet(url, "GET");
-            data = new JSONArray(returnedJson);
+            data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
-                JSONObject text = data.getJSONObject(0);
+                //JSONObject text = data.getJSONObject(0);
 
-                Device d = new MHub(UUID.fromString(text.getString("UUID")),
-                                  text.getString("description"));
+                Device d = new MHub(UUID.fromString(data.getString("uuid")),
+                                  data.getString("description"));
                 resultSet.add(d);
             }
         } catch (Exception ex) {
@@ -582,19 +583,19 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         
         String url;
         String returnedJson;
-        JSONArray data;
+        JSONObject data;
         PhysicalSpace r = null;
         
         url = semantic+ "persons/"+personID+"/things";
         try {
             returnedJson = REST.sendGet(url, "GET");
-            data = new JSONArray(returnedJson);
+            data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
-                JSONObject text = data.getJSONObject(0);
+                //JSONObject text = data.getJSONObject(0);
 
-                Device d = new Thing(UUID.fromString(text.getString("UUID")),
-                                  text.getString("description"));
+                Device d = new Thing(UUID.fromString(data.getString("UUID")),
+                                  data.getString("description"));
                 resultSet.add(d);
             }
         } catch (Exception ex) {
@@ -610,19 +611,19 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         
         String url;
         String returnedJson;
-        JSONArray data;
+        JSONObject data;
         PhysicalSpace r = null;
         
         url = semantic+ "persons/"+personID+"/mhubs";
         try {
             returnedJson = REST.sendGet(url, "GET");
-            data = new JSONArray(returnedJson);
+            data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
-                JSONObject text = data.getJSONObject(0);
+                //JSONObject text = data.getJSONObject(0);
 
-                Device d = new MHub(UUID.fromString(text.getString("UUID")),
-                                  text.getString("description"));
+                Device d = new MHub(UUID.fromString(data.getString("UUID")),
+                                  data.getString("description"));
                 resultSet.add(d);
             }
         } catch (Exception ex) {
@@ -790,20 +791,20 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     public Person getPerson(long personID){
         String url;
         String returnedJson;
-        JSONArray data;
+        JSONObject data;
         Person p = null;
         
         url = semantic+ "persons/"+personID;
         try {
             returnedJson = REST.sendGet(url, "GET");
-            data = new JSONArray(returnedJson);
+            data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
-                JSONObject text = data.getJSONObject(0);
+                //JSONObject text = data.getJSONObject(0);
 
                 p = new Person(personID,
-                        text.getString("shortName"),
-                        text.getString("email"));
+                        data.getString("shortName"),
+                        data.getString("email"));
             }
         } catch (Exception ex) {
             Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
@@ -835,29 +836,29 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     public Person getPersonByMHub(UUID mhubID) {
         String url;
         String returnedJson;
-        JSONArray data;
+        JSONObject data;
         Person p = null;
         
         url = semantic+ "mhubs/"+mhubID;
         try {
             returnedJson = REST.sendGet(url, "GET");
-            data = new JSONArray(returnedJson);
+            data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
-                JSONObject text = data.getJSONObject(0);
-                JSONArray data2 = text.getJSONArray("holder");
-                JSONObject text2 = data2.getJSONObject(0);
+                //JSONObject text = data.getJSONObject(0);
+                //JSONArray data2 = data.getJSONArray("holder");
+                JSONObject text2 = data.getJSONObject("holder");
                 
-                url = semantic+"persons/"+text2.getString("id");
+                url = semantic+"persons/"+text2.getLong("id");
                 
                 returnedJson = REST.sendGet(url, "GET");
-                data = new JSONArray(returnedJson);
+                data = new JSONObject(returnedJson);
                 if(data.length() != 0){
-                text = data.getJSONObject(0);
+                //text = data.getJSONObject(0);
                 
                 p = new Person(text2.getLong("id"),
-                        text.getString("shortName"),
-                        text.getString("email"));
+                        data.getString("shortName"),
+                        data.getString("email"));
                 }
             }
         } catch (Exception ex) {
@@ -870,29 +871,29 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     public Person getPersonByThing(UUID thingID) {
         String url;
         String returnedJson;
-        JSONArray data;
+        JSONObject data;
         Person p = null;
         
         url = semantic+ "things/"+thingID;
         try {
             returnedJson = REST.sendGet(url, "GET");
-            data = new JSONArray(returnedJson);
+            data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
-                JSONObject text = data.getJSONObject(0);
-                JSONArray data2 = text.getJSONArray("holder");
-                JSONObject text2 = data2.getJSONObject(0);
+                //JSONObject text = data.getJSONObject(0);
+                //JSONArray data2 = text.getJSONArray("holder");
+                JSONObject text2 = data.getJSONObject("holder");
                 
-                url = semantic+"persons/"+text2.getString("id");
+                url = semantic+"persons/"+text2.getLong("id");
                 
                 returnedJson = REST.sendGet(url, "GET");
-                data = new JSONArray(returnedJson);
+                data = new JSONObject(returnedJson);
                 if(data.length() != 0){
-                text = data.getJSONObject(0);
+                //text = data.getJSONObject(0);
                 
                 p = new Person(text2.getLong("id"),
-                        text.getString("shortName"),
-                        text.getString("email"));
+                        data.getString("shortName"),
+                        data.getString("email"));
                 }
             }
         } catch (Exception ex) {
@@ -905,29 +906,29 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     public PhysicalSpace getPhysicalSpaceByMHub(UUID mhubID) {
         String url;
         String returnedJson;
-        JSONArray data;
+        JSONObject data;
         PhysicalSpace r = null;
         
         url = semantic+ "mhubs/"+mhubID;
         try {
             returnedJson = REST.sendGet(url, "GET");
-            data = new JSONArray(returnedJson);
+            data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
-                JSONObject text = data.getJSONObject(0);
-                JSONArray data2 = text.getJSONArray("holder");
-                JSONObject text2 = data2.getJSONObject(0);
+                //JSONObject text = data.getJSONObject(0);
+                //JSONArray data2 = text.getJSONArray("holder");
+                JSONObject text2 = data.getJSONObject("holder");
                 
-                url = semantic+"persons/"+text2.getString("id");
+                url = semantic+"persons/"+text2.getLong("id");
                 
                 returnedJson = REST.sendGet(url, "GET");
-                data = new JSONArray(returnedJson);
+                data = new JSONObject(returnedJson);
                 if(data.length() != 0){
-                text = data.getJSONObject(0);
+                //text = data.getJSONObject(0);
                 
                 r = new PhysicalSpace(text2.getLong("id"),
-                        text.getString("shortName"),
-                        text.getString("description"));
+                        data.getString("shortName"),
+                        data.getString("description"));
                 }
             }
         } catch (Exception ex) {
@@ -940,29 +941,29 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
     public PhysicalSpace getPhysicalSpaceByThing(UUID thingID) {
         String url;
         String returnedJson;
-        JSONArray data;
+        JSONObject data;
         PhysicalSpace r = null;
         
         url = semantic+ "things/"+thingID;
         try {
             returnedJson = REST.sendGet(url, "GET");
-            data = new JSONArray(returnedJson);
+            data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
-                JSONObject text = data.getJSONObject(0);
-                JSONArray data2 = text.getJSONArray("holder");
-                JSONObject text2 = data2.getJSONObject(0);
+                //JSONObject text = data.getJSONObject(0);
+                //JSONArray data2 = text.getJSONArray("holder");
+                JSONObject text2 = data.getJSONObject("holder");
                 
-                url = semantic+"persons/"+text2.getString("id");
+                url = semantic+"persons/"+text2.getLong("id");
                 
                 returnedJson = REST.sendGet(url, "GET");
-                data = new JSONArray(returnedJson);
+                data = new JSONObject(returnedJson);
                 if(data.length() != 0){
-                text = data.getJSONObject(0);
+                //text = data.getJSONObject(0);
                 
                 r = new PhysicalSpace(text2.getLong("id"),
-                        text.getString("shortName"),
-                        text.getString("description"));
+                        data.getString("shortName"),
+                        data.getString("description"));
                 }
             }
         } catch (Exception ex) {

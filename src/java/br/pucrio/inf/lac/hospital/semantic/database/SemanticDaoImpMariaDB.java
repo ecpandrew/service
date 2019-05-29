@@ -493,8 +493,8 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 //text = new JSONObject(returnedJson);
 
                 r = new PhysicalSpace(roomID,
-                        convert(data.getString("name")),
-                        convert(data.getString("description")));
+                        data.getString("name"),
+                        data.getString("description"));
             }
         } catch (Exception ex) {
             Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
@@ -540,7 +540,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 JSONObject text = data.getJSONObject(0);
 
                 Device d = new Thing(UUID.fromString(text.getString("uuid")),
-                                  convert(text.getString("description")));
+                                  text.getString("description"));
                 resultSet.add(d);
             }
         } catch (Exception ex) {
@@ -568,7 +568,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 JSONObject text = data.getJSONObject(0);
 
                 Device d = new MHub(UUID.fromString(text.getString("uuid")),
-                                  convert(text.getString("description")));
+                                  text.getString("description"));
                 resultSet.add(d);
             }
         } catch (Exception ex) {
@@ -596,7 +596,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 JSONObject text = data.getJSONObject(0);
 
                 Device d = new Thing(UUID.fromString(text.getString("uuid")),
-                                  convert(text.getString("description")));
+                                  text.getString("description"));
                 resultSet.add(d);
             }
         } catch (Exception ex) {
@@ -624,7 +624,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 JSONObject text = data.getJSONObject(0);
 
                 Device d = new MHub(UUID.fromString(text.getString("uuid")),
-                                  convert(text.getString("description")));
+                                  text.getString("description"));
                 resultSet.add(d);
             }
         } catch (Exception ex) {
@@ -804,7 +804,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 //JSONObject text = data.getJSONObject(0);
 
                 p = new Person(personID,
-                        convert(data.getString("shortName")),
+                        data.getString("shortName"),
                         data.getString("email"));
             }
         } catch (Exception ex) {
@@ -858,7 +858,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 //text = data.getJSONObject(0);
                 
                 p = new Person(text2.getLong("id"),
-                        convert(data.getString("shortName")),
+                        data.getString("shortName"),
                         data.getString("email"));
                 }
             }
@@ -893,7 +893,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 //text = data.getJSONObject(0);
                 
                 p = new Person(text2.getLong("id"),
-                        convert(data.getString("shortName")),
+                        data.getString("shortName"),
                         data.getString("email"));
                 }
             }
@@ -928,8 +928,8 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 //text = data.getJSONObject(0);
                 
                 r = new PhysicalSpace(text2.getLong("id"),
-                        convert(data.getString("name")),
-                        convert(data.getString("description")));
+                        data.getString("name"),
+                        data.getString("description"));
                 }
             }
         } catch (Exception ex) {
@@ -963,8 +963,8 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 //text = data.getJSONObject(0);
                 
                 r = new PhysicalSpace(text2.getLong("id"),
-                        convert(data.getString("name")),
-                        convert(data.getString("description")));
+                        data.getString("name"),
+                        data.getString("description"));
                 }
             }
         } catch (Exception ex) {

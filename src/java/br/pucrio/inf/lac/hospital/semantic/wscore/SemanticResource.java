@@ -121,7 +121,7 @@ public class SemanticResource {
     }
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("physical_spaces/{id}/persons/")
     public String getPersonByPhysicalSpace(@PathParam("id") long roomID) throws Exception {
         PhysicalSpace r = dao.getPhysicalSpace(roomID);
@@ -176,7 +176,7 @@ public class SemanticResource {
     }
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("physical_spaces/{id}/persons/{Q}/{W}/")
     public String getPersonByPhysicalSpaceAndTime(@PathParam("id") long roomID, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
         PhysicalSpace r = dao.getPhysicalSpace(roomID);
@@ -232,7 +232,7 @@ public class SemanticResource {
     }
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("persons/{ids: .*}/rendezvous/{Q}/{W}/")
     public String getPersonRendezvous(@PathParam("ids") List<PathSegment> ids, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
         boolean flag = false;
@@ -319,7 +319,7 @@ public class SemanticResource {
     }
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("persons/{ids: .*}/physical_spaces/")
     public String getPhysicalSpaceByPerson(@PathParam("ids") List<PathSegment> ids) throws Exception {
         Set<Person> personGroup = new HashSet<>();
@@ -375,9 +375,9 @@ public class SemanticResource {
     }
     
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("persons/{ids: .*}/physical_spaces/{Q}/{W}/")
-    public String getPhysicalSpaceByPersonAndTime(@PathParam("ids") List<PathSegment> ids, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
+    public String c(@PathParam("ids") List<PathSegment> ids, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
         Set<Person> personGroup = new HashSet<>();
         for (PathSegment id: ids) {
             Person p = dao.getPerson(Long.parseLong(id.getPath()));

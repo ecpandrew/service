@@ -145,7 +145,7 @@ public class SemanticResource {
             }else if(MODE == 1){
                 rendezvousSet = getDurationByMHub(d.getUuID());   //duration/mhub/{mhubID}
             }
-            if(rendezvousSet.isEmpty()) return "[]";
+            if(rendezvousSet == null || rendezvousSet.isEmpty()) return "[]";
             for (Rendezvous re: rendezvousSet) {
                 Person p;
                 if(MODE == 0){
@@ -200,7 +200,7 @@ public class SemanticResource {
             }else if(MODE == 1){
                 rendezvousSet = getDurationByMHub(d.getUuID(), Q, W);   //duration/mhub/{mhubID}/{W}/{delta}
             }
-            if(rendezvousSet.isEmpty()) return "[]";
+            if(rendezvousSet == null || rendezvousSet.isEmpty()) return "[]";
             for (Rendezvous re: rendezvousSet) {
                 Person p;
                 if(MODE == 0){
@@ -261,7 +261,7 @@ public class SemanticResource {
                 }else{
                     rendezvousSet = getDurationByThing(d.getUuID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
                 }
-                if(rendezvousSet.isEmpty()) return "[]";
+                if(rendezvousSet == null || rendezvousSet.isEmpty()) return "[]";
                 for (Rendezvous re: rendezvousSet) {
                     PhysicalSpace r;
                     if(MODE == 0){
@@ -347,7 +347,7 @@ public class SemanticResource {
                 }else{
                     rendezvousSet = getDurationByThing(d.getUuID());  //duration/thing/{thingID}
                 }
-                if(rendezvousSet.isEmpty()) return "[]";
+                if(rendezvousSet == null || rendezvousSet.isEmpty()) return "[]";
                 for (Rendezvous re: rendezvousSet) {
                     PhysicalSpace r;
                     if(MODE == 0){
@@ -402,7 +402,7 @@ public class SemanticResource {
                 }else{
                     rendezvousSet = getDurationByThing(d.getUuID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
                 }
-                if(rendezvousSet.isEmpty()) return "[]";
+                if(rendezvousSet == null || rendezvousSet.isEmpty()) return "[]";
                 for (Rendezvous re: rendezvousSet) {
                     PhysicalSpace r;
                     if(MODE == 0){

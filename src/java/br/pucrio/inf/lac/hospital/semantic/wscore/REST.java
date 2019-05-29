@@ -31,7 +31,7 @@ public class REST {
         System.out.println("Response Code : " + responseCode);
 
         BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
+                new InputStreamReader(con.getInputStream(), "UTF8"));
         String inputLine;
         StringBuffer response = new StringBuffer();
 

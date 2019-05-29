@@ -8,6 +8,7 @@ import br.pucrio.inf.lac.hospital.semantic.data.Person;
 import br.pucrio.inf.lac.hospital.semantic.data.PhysicalSpace;
 import br.pucrio.inf.lac.hospital.semantic.data.Thing;
 import br.pucrio.inf.lac.hospital.semantic.wscore.REST;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 //import java.sql.Date;
 import java.sql.DriverManager;
@@ -492,8 +493,8 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 //text = new JSONObject(returnedJson);
 
                 r = new PhysicalSpace(roomID,
-                        data.getString("name"),
-                        data.getString("description"));
+                        convert(data.getString("name")),
+                        convert(data.getString("description")));
             }
         } catch (Exception ex) {
             Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
@@ -539,7 +540,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 JSONObject text = data.getJSONObject(0);
 
                 Device d = new Thing(UUID.fromString(text.getString("uuid")),
-                                  text.getString("description"));
+                                  convert(text.getString("description")));
                 resultSet.add(d);
             }
         } catch (Exception ex) {
@@ -567,7 +568,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 JSONObject text = data.getJSONObject(0);
 
                 Device d = new MHub(UUID.fromString(text.getString("uuid")),
-                                  text.getString("description"));
+                                  convert(text.getString("description")));
                 resultSet.add(d);
             }
         } catch (Exception ex) {
@@ -595,7 +596,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 JSONObject text = data.getJSONObject(0);
 
                 Device d = new Thing(UUID.fromString(text.getString("uuid")),
-                                  text.getString("description"));
+                                  convert(text.getString("description")));
                 resultSet.add(d);
             }
         } catch (Exception ex) {
@@ -623,7 +624,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 JSONObject text = data.getJSONObject(0);
 
                 Device d = new MHub(UUID.fromString(text.getString("uuid")),
-                                  text.getString("description"));
+                                  convert(text.getString("description")));
                 resultSet.add(d);
             }
         } catch (Exception ex) {
@@ -803,7 +804,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 //JSONObject text = data.getJSONObject(0);
 
                 p = new Person(personID,
-                        data.getString("shortName"),
+                        convert(data.getString("shortName")),
                         data.getString("email"));
             }
         } catch (Exception ex) {
@@ -857,7 +858,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 //text = data.getJSONObject(0);
                 
                 p = new Person(text2.getLong("id"),
-                        data.getString("shortName"),
+                        convert(data.getString("shortName")),
                         data.getString("email"));
                 }
             }
@@ -892,7 +893,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 //text = data.getJSONObject(0);
                 
                 p = new Person(text2.getLong("id"),
-                        data.getString("shortName"),
+                        convert(data.getString("shortName")),
                         data.getString("email"));
                 }
             }
@@ -927,8 +928,8 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 //text = data.getJSONObject(0);
                 
                 r = new PhysicalSpace(text2.getLong("id"),
-                        data.getString("name"),
-                        data.getString("description"));
+                        convert(data.getString("name")),
+                        convert(data.getString("description")));
                 }
             }
         } catch (Exception ex) {
@@ -962,8 +963,8 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 //text = data.getJSONObject(0);
                 
                 r = new PhysicalSpace(text2.getLong("id"),
-                        data.getString("name"),
-                        data.getString("description"));
+                        convert(data.getString("name")),
+                        convert(data.getString("description")));
                 }
             }
         } catch (Exception ex) {
@@ -972,6 +973,15 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         return r;
     }
     
+    public static String convert(String s){
+        String r = null;
+        try{
+            r = new String(s.getBytes("ISO-8859-1"), "UTF-8");
+        }catch(UnsupportedEncodingException ex){
+            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return r;
+    }
 }
 
 

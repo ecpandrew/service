@@ -347,24 +347,27 @@ public class SemanticResource {
                 }else{
                     rendezvousSet = getDurationByThing(d.getUuID());  //duration/thing/{thingID}
                 }
-                if(rendezvousSet == null || rendezvousSet.isEmpty()) return "[]";
-                for (Rendezvous re: rendezvousSet) {
-                    PhysicalSpace r;
-                    if(MODE == 0){
-                        r = dao.getPhysicalSpaceByThing(re.getThingID());
-                    }else{
-                        r = dao.getPhysicalSpaceByMHub(re.getMhubID());
+                if(rendezvousSet == null || rendezvousSet.isEmpty()){
+                    returnJson += "{}";
+                }else{
+                    for (Rendezvous re: rendezvousSet) {
+                        PhysicalSpace r;
+                        if(MODE == 0){
+                            r = dao.getPhysicalSpaceByThing(re.getThingID());
+                        }else{
+                            r = dao.getPhysicalSpaceByMHub(re.getMhubID());
+                        }
+                        if(r == null) return "[]";
+
+                        returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
+                            + "\"physical_space\": \"" + r.getRoomName() + "\", ";
+                        if(MODE == 0){
+                            returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
+                        }else if(MODE == 1){
+                            returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
+                        }
+                        returnJson += "\"duration\": " + re.getDuration() + "}, ";
                     }
-                    if(r == null) return "[]";
-                    
-                    returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
-                        + "\"physical_space\": \"" + r.getRoomName() + "\", ";
-                    if(MODE == 0){
-                        returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
-                    }else if(MODE == 1){
-                        returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
-                    }
-                    returnJson += "\"duration\": " + re.getDuration() + "}, ";
                 }
             }
         }
@@ -402,25 +405,28 @@ public class SemanticResource {
                 }else{
                     rendezvousSet = getDurationByThing(d.getUuID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
                 }
-                if(rendezvousSet == null || rendezvousSet.isEmpty()) return "[]";
-                for (Rendezvous re: rendezvousSet) {
-                    PhysicalSpace r;
-                    if(MODE == 0){
-                        r = dao.getPhysicalSpaceByThing(re.getThingID());
-                    }else{
-                        r = dao.getPhysicalSpaceByMHub(re.getMhubID());
+                if(rendezvousSet == null || rendezvousSet.isEmpty()){
+                    returnJson += "{}";
+                }else{
+                    for (Rendezvous re: rendezvousSet) {
+                        PhysicalSpace r;
+                        if(MODE == 0){
+                            r = dao.getPhysicalSpaceByThing(re.getThingID());
+                        }else{
+                            r = dao.getPhysicalSpaceByMHub(re.getMhubID());
+                        }
+                        if(r == null) return "[]";
+
+                        returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
+                            + "\"physical_space\": \"" + r.getRoomName() + "\", ";
+                        if(MODE == 0){
+                            returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
+                        }else if(MODE == 1){
+                            returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
+                        }
+                        returnJson += "\"arrive\": " + re.getArrive() + ", ";
+                        returnJson += "\"depart\": " + re.getDepart() + "}, ";
                     }
-                    if(r == null) return "[]";
-                    
-                    returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
-                        + "\"physical_space\": \"" + r.getRoomName() + "\", ";
-                    if(MODE == 0){
-                        returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
-                    }else if(MODE == 1){
-                        returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
-                    }
-                    returnJson += "\"arrive\": " + re.getArrive() + ", ";
-                    returnJson += "\"depart\": " + re.getDepart() + "}, ";
                 }
             }
         }

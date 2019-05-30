@@ -348,7 +348,7 @@ public class SemanticResource {
                     rendezvousSet = getDurationByThing(d.getUuID());  //duration/thing/{thingID}
                 }
                 if(rendezvousSet == null || rendezvousSet.isEmpty()){
-                    returnJson += "{}";
+                    returnJson += "";
                 }else{
                     for (Rendezvous re: rendezvousSet) {
                         PhysicalSpace r;
@@ -371,7 +371,8 @@ public class SemanticResource {
                 }
             }
         }
-        returnJson = returnJson.substring(0, returnJson.length() - 2);
+        if(returnJson.length() > 2)
+            returnJson = returnJson.substring(0, returnJson.length() - 2);
         returnJson += "]";
         
         return returnJson;
@@ -406,7 +407,7 @@ public class SemanticResource {
                     rendezvousSet = getDurationByThing(d.getUuID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
                 }
                 if(rendezvousSet == null || rendezvousSet.isEmpty()){
-                    returnJson += "{}";
+                    returnJson += "";
                 }else{
                     for (Rendezvous re: rendezvousSet) {
                         PhysicalSpace r;
@@ -430,7 +431,8 @@ public class SemanticResource {
                 }
             }
         }
-        returnJson = returnJson.substring(0, returnJson.length() - 2);
+        if(returnJson.length() > 2)
+            returnJson = returnJson.substring(0, returnJson.length() - 2);
         returnJson += "]";
         
         return returnJson;

@@ -145,30 +145,33 @@ public class SemanticResource {
             }else if(MODE == 1){
                 rendezvousSet = getDurationByMHub(d.getUuID());   //duration/mhub/{mhubID}
             }
-            if(rendezvousSet == null || rendezvousSet.isEmpty()) return "[]";
-            for (Rendezvous re: rendezvousSet) {
-                Person p;
-                if(MODE == 0){
-                    p = dao.getPersonByMHub(re.getMhubID());
-                }else{
-                    p = dao.getPersonByThing(re.getThingID());
-                }
-                //HasA h = dao.getHasAByDevice(d2.getDeviceID());
-                //Person p = dao.getPerson(h.getPersonID());
-                if(p == null) return "[]";
-                
-                returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
-                        + "\"email\": \"" + p.getPersonEmail() + "\", ";
+            if(rendezvousSet == null || rendezvousSet.isEmpty()){
+                    returnJson += "";
+            }else{
+                for (Rendezvous re: rendezvousSet) {
+                    Person p;
+                    if(MODE == 0){
+                        p = dao.getPersonByMHub(re.getMhubID());
+                    }else{
+                        p = dao.getPersonByThing(re.getThingID());
+                    }
+                    //HasA h = dao.getHasAByDevice(d2.getDeviceID());
+                    //Person p = dao.getPerson(h.getPersonID());
+                    if(p == null) return "[]";
 
-                if(MODE == 0){
-                    returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
-                }else if(MODE == 1){
-                    returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
-                }
+                    returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
+                            + "\"email\": \"" + p.getPersonEmail() + "\", ";
 
-                returnJson += "\"duration\": " + re.getDuration() + "}, ";
+                    if(MODE == 0){
+                        returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
+                    }else if(MODE == 1){
+                        returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
+                    }
+
+                    returnJson += "\"duration\": " + re.getDuration() + "}, ";
+                }
             }
-            }
+        }
         //Removes the last coma and space
         returnJson = returnJson.substring(0, returnJson.length() - 2);
         returnJson += "]";
@@ -200,29 +203,32 @@ public class SemanticResource {
             }else if(MODE == 1){
                 rendezvousSet = getDurationByMHub(d.getUuID(), Q, W);   //duration/mhub/{mhubID}/{W}/{delta}
             }
-            if(rendezvousSet == null || rendezvousSet.isEmpty()) return "[]";
-            for (Rendezvous re: rendezvousSet) {
-                Person p;
-                if(MODE == 0){
-                    p = dao.getPersonByMHub(re.getMhubID());
-                }else{
-                    p = dao.getPersonByThing(re.getThingID());
+            if(rendezvousSet == null || rendezvousSet.isEmpty()){
+                    returnJson += "";
+            }else{
+                for (Rendezvous re: rendezvousSet) {
+                    Person p;
+                    if(MODE == 0){
+                        p = dao.getPersonByMHub(re.getMhubID());
+                    }else{
+                        p = dao.getPersonByThing(re.getThingID());
+                    }
+                    //HasA h = dao.getHasAByDevice(d2.getDeviceID());
+                    //Person p = dao.getPerson(h.getPersonID());
+                    if(p == null) return "[]";
+
+                    returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
+                            + "\"email\": \"" + p.getPersonEmail() + "\", ";
+
+                    if(MODE == 0){
+                        returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
+                    }else if(MODE == 1){
+                        returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
+                    }
+
+                    returnJson += "\"arrive\": " + re.getArrive() + ", ";
+                    returnJson += "\"depart\": " + re.getDepart() + "}, ";
                 }
-                //HasA h = dao.getHasAByDevice(d2.getDeviceID());
-                //Person p = dao.getPerson(h.getPersonID());
-                if(p == null) return "[]";
-                
-                returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
-                        + "\"email\": \"" + p.getPersonEmail() + "\", ";
-                
-                if(MODE == 0){
-                    returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
-                }else if(MODE == 1){
-                    returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
-                }
-                
-                returnJson += "\"arrive\": " + re.getArrive() + ", ";
-                returnJson += "\"depart\": " + re.getDepart() + "}, ";
             }
         }
         //Removes the last coma and space
@@ -261,16 +267,17 @@ public class SemanticResource {
                 }else{
                     rendezvousSet = getDurationByThing(d.getUuID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
                 }
-                if(rendezvousSet == null || rendezvousSet.isEmpty()) return "[]";
-                for (Rendezvous re: rendezvousSet) {
-                    PhysicalSpace r;
-                    if(MODE == 0){
-                        r = dao.getPhysicalSpaceByThing(re.getThingID());
-                    }else{
-                        r = dao.getPhysicalSpaceByMHub(re.getMhubID());
+                if(rendezvousSet != null && !rendezvousSet.isEmpty()){
+                    for (Rendezvous re: rendezvousSet) {
+                        PhysicalSpace r;
+                        if(MODE == 0){
+                            r = dao.getPhysicalSpaceByThing(re.getThingID());
+                        }else{
+                            r = dao.getPhysicalSpaceByMHub(re.getMhubID());
+                        }
+
+                        reSet.add(new Rendezvous(p.getShortName(), r.getRoomName(), re.getArrive(), re.getDepart()));
                     }
-                    
-                    reSet.add(new Rendezvous(p.getShortName(), r.getRoomName(), re.getArrive(), re.getDepart()));
                 }
             }
         }
@@ -512,7 +519,8 @@ public class SemanticResource {
             mhubID = UUID.fromString(text.getString("mhubID"));
             arrive = text.getLong("arrive");
             depart = text.getLong("depart");
-            rendezvousSet.add(new Rendezvous(mhubID, thingID, arrive, depart));
+            if(arrive != depart)
+                rendezvousSet.add(new Rendezvous(mhubID, thingID, arrive, depart));
         }
         
         return rendezvousSet;

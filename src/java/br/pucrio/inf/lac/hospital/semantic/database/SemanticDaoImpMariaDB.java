@@ -531,13 +531,13 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         JSONArray data;
         PhysicalSpace r = null;
         
-        url = semantic+ "physical_spaces/"+roomID+"/things";
+        url = semantic+ "physical_spaces/"+roomID+"/descendant/things";
         try {
             returnedJson = REST.sendGet(url, "GET");
             data = new JSONArray(returnedJson);
         
-            if(data.length() != 0){
-                JSONObject text = data.getJSONObject(0);
+            for(int i = 0; i < data.length(); i++){
+                JSONObject text = data.getJSONObject(i);
 
                 Device d = new Thing(UUID.fromString(text.getString("uuid")),
                                   text.getString("description"));
@@ -559,13 +559,13 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         JSONArray data;
         PhysicalSpace r = null;
         
-        url = semantic+ "physical_spaces/"+roomID+"/mhubs";
+        url = semantic+ "physical_spaces/"+roomID+"/descendant/mhubs";
         try {
             returnedJson = REST.sendGet(url, "GET");
             data = new JSONArray(returnedJson);
         
-            if(data.length() != 0){
-                JSONObject text = data.getJSONObject(0);
+            for(int i = 0; i < data.length(); i++){
+                JSONObject text = data.getJSONObject(i);
 
                 Device d = new MHub(UUID.fromString(text.getString("uuid")),
                                   text.getString("description"));

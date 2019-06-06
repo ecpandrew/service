@@ -486,7 +486,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         url = semantic+ "physical_spaces/"+roomID;
         try {
             returnedJson = REST.sendGet(url, "GET");
-            //data = new JSONArray(returnedJson);
+            if(returnedJson == null) return null;
             data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
@@ -534,6 +534,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         url = semantic+ "physical_spaces/"+roomID+"/descendant/things";
         try {
             returnedJson = REST.sendGet(url, "GET");
+            if(returnedJson == null) return null;
             data = new JSONArray(returnedJson);
         
             for(int i = 0; i < data.length(); i++){
@@ -562,6 +563,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         url = semantic+ "physical_spaces/"+roomID+"/descendant/mhubs";
         try {
             returnedJson = REST.sendGet(url, "GET");
+            if(returnedJson == null) return null;
             data = new JSONArray(returnedJson);
         
             for(int i = 0; i < data.length(); i++){
@@ -590,6 +592,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         url = semantic+ "persons/"+personID+"/things";
         try {
             returnedJson = REST.sendGet(url, "GET");
+            if(returnedJson == null) return null;
             data = new JSONArray(returnedJson);
         
             if(data.length() != 0){
@@ -618,6 +621,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         url = semantic+ "persons/"+personID+"/mhubs";
         try {
             returnedJson = REST.sendGet(url, "GET");
+            if(returnedJson == null) return null;
             data = new JSONArray(returnedJson);
         
             if(data.length() != 0){
@@ -798,6 +802,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         url = semantic+ "persons/"+personID;
         try {
             returnedJson = REST.sendGet(url, "GET");
+            if(returnedJson == null) return null;
             data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
@@ -843,6 +848,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         url = semantic+ "mhubs/"+mhubID;
         try {
             returnedJson = REST.sendGet(url, "GET");
+            if(returnedJson == null) return null;
             data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
@@ -853,6 +859,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 url = semantic+"persons/"+text2.getLong("id");
                 
                 returnedJson = REST.sendGet(url, "GET");
+                if(returnedJson == null) return null;
                 data = new JSONObject(returnedJson);
                 if(data.length() != 0){
                 //text = data.getJSONObject(0);
@@ -878,6 +885,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         url = semantic+ "things/"+thingID;
         try {
             returnedJson = REST.sendGet(url, "GET");
+            if(returnedJson == null) return null;
             data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
@@ -888,6 +896,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 url = semantic+"persons/"+text2.getLong("id");
                 
                 returnedJson = REST.sendGet(url, "GET");
+                if(returnedJson == null) return null;
                 data = new JSONObject(returnedJson);
                 if(data.length() != 0){
                 //text = data.getJSONObject(0);
@@ -913,6 +922,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         url = semantic+ "mhubs/"+mhubID;
         try {
             returnedJson = REST.sendGet(url, "GET");
+            if(returnedJson == null) return null;
             data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
@@ -923,6 +933,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 url = semantic+"physical_spaces/"+text2.getLong("id");
                 
                 returnedJson = REST.sendGet(url, "GET");
+                if(returnedJson == null) return null;
                 data = new JSONObject(returnedJson);
                 if(data.length() != 0){
                 //text = data.getJSONObject(0);
@@ -953,6 +964,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         url = semantic+ "things/"+thingID;
         try {
             returnedJson = REST.sendGet(url, "GET");
+            if(returnedJson == null) return null;
             data = new JSONObject(returnedJson);
         
             if(data.length() != 0){
@@ -963,6 +975,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 url = semantic+"physical_spaces/"+text2.getLong("id");
                 
                 returnedJson = REST.sendGet(url, "GET");
+                if(returnedJson == null) return null;
                 data = new JSONObject(returnedJson);
                 if(data.length() != 0){
                 //text = data.getJSONObject(0);

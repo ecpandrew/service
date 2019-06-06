@@ -29,6 +29,8 @@ public class REST {
         int responseCode = con.getResponseCode();
         System.out.println("\nSending 'GET' request to URL : " + url);
         System.out.println("Response Code : " + responseCode);
+        
+        if(responseCode != 200) return null;
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream(), "UTF8"));

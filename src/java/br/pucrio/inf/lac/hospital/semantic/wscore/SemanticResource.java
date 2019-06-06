@@ -33,6 +33,7 @@ import java.util.UUID;
 //import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.Produces;
 //import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -123,9 +124,9 @@ public class SemanticResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("physical_spaces/{id}/persons/")
-    public String getPersonByPhysicalSpace(@PathParam("id") long roomID) throws Exception {
+    public Response getPersonByPhysicalSpace(@PathParam("id") long roomID) throws Exception {
         PhysicalSpace r = dao.getPhysicalSpace(roomID);
-        if(r == null) return "[]";
+        if(r == null) return Response.status(404).build();
         //Set<HasA> hasASet = dao.getHasAByRoom(r.getRoomID());
         Set<Device> deviceSet;
         if(MODE == 0){
@@ -160,27 +161,29 @@ public class SemanticResource {
                     }
                     //HasA h = dao.getHasAByDevice(d2.getDeviceID());
                     //Person p = dao.getPerson(h.getPersonID());
-                    if(p == null) return "[]";
+                    if(p != null){
 
                     returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
                             + "\"email\": \"" + p.getPersonEmail() + "\", "
                             + "\"physical_space\": \"" + r2.getRoomName() + "\", "
                             + "\"duration\": " + re.getDuration() + "}, ";
+                    }
                 }
             }
         }
         //Removes the last coma and space
-        returnJson = returnJson.substring(0, returnJson.length() - 2);
+        if(returnJson.length() > 2)
+            returnJson = returnJson.substring(0, returnJson.length() - 2);
         returnJson += "]";
-        return returnJson;
+        return Response.ok(returnJson).build();
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("physical_spaces/{id}/persons/{Q}/{W}/")
-    public String getPersonByPhysicalSpaceAndTime(@PathParam("id") long roomID, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
+    public Response getPersonByPhysicalSpaceAndTime(@PathParam("id") long roomID, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
         PhysicalSpace r = dao.getPhysicalSpace(roomID);
-        if(r == null) return "[]";
+        if(r == null) return Response.status(404).build();
         //Set<HasA> hasASet = dao.getHasAByRoom(r.getRoomID());
         Set<Device> deviceSet;
         if(MODE == 0){
@@ -215,36 +218,38 @@ public class SemanticResource {
                     }
                     //HasA h = dao.getHasAByDevice(d2.getDeviceID());
                     //Person p = dao.getPerson(h.getPersonID());
-                    if(p == null) return "[]";
+                    if(p != null){
 
                     returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
                             + "\"email\": \"" + p.getPersonEmail() + "\", "
                             + "\"physical_space\": \"" + r2.getRoomName() + "\", "
                             + "\"arrive\": " + re.getArrive() + ", "
                             + "\"depart\": " + re.getDepart() + "}, ";
+                    }
                 }
             }
         }
         //Removes the last coma and space
-        returnJson = returnJson.substring(0, returnJson.length() - 2);
+        if(returnJson.length() > 2)
+            returnJson = returnJson.substring(0, returnJson.length() - 2);
         returnJson += "]";
-        return returnJson;
+        return Response.ok(returnJson).build();
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("persons/{ids: .*}/rendezvous/{Q}/{W}/")
-    public String getPersonRendezvous(@PathParam("ids") List<PathSegment> ids, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
+    public Response getPersonRendezvous(@PathParam("ids") List<PathSegment> ids, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
         boolean flag = false;
         Set<Person> personGroup = new HashSet<>();
         Set<Rendezvous> reSet = new HashSet<>();
         ArrayList<GroupRendezvous> gReSet = new ArrayList<>();
         for (PathSegment id: ids) {
             Person p = dao.getPerson(Long.parseLong(id.getPath()));
-            if(p == null) return "[]";
+            if(p == null) return Response.status(404).build();
             personGroup.add(p);
         }
-        if(personGroup.size() < 2 || personGroup.size() != ids.size()) return "[]";
+        if(personGroup.size() < 2 || personGroup.size() != ids.size()) return Response.status(404).build();
         for (Person p: personGroup){
             //Set<HasA> hasASet = dao.getHasAByPerson(p.getPersonID());
             Set<Device> deviceSet;
@@ -296,7 +301,7 @@ public class SemanticResource {
                 }
             }
         }
-        if(gReSet.isEmpty()) return "[]";
+        if(gReSet.isEmpty()) return Response.ok("[]").build();
 
         String returnJson = "[";
         //String returnJson = "{ "
@@ -316,17 +321,17 @@ public class SemanticResource {
          //Removes the last coma and space
         returnJson = returnJson.substring(0, returnJson.length() - 2);
         returnJson += "]";
-        return returnJson;
+        return Response.ok(returnJson).build();
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("persons/{ids: .*}/physical_spaces/")
-    public String getPhysicalSpaceByPerson(@PathParam("ids") List<PathSegment> ids) throws Exception {
+    public Response getPhysicalSpaceByPerson(@PathParam("ids") List<PathSegment> ids) throws Exception {
         Set<Person> personGroup = new HashSet<>();
         for (PathSegment id: ids) {
             Person p = dao.getPerson(Long.parseLong(id.getPath()));
-            if(p == null) return "[]";
+            if(p == null) Response.status(404).build();
             personGroup.add(p);
         }
         //if(personGroup.size() < 2 || personGroup.size() != ids.size()) return "[]";
@@ -358,12 +363,13 @@ public class SemanticResource {
                         }else{
                             r = dao.getPhysicalSpaceByMHub(re.getMhubID());
                         }
-                        if(r == null) return "[]";
+                        if(r != null){
 
                         returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
                             + "\"physical_space\": \"" + r.getRoomName() + "\", "
                             + "\"description\": \"" + r.getRoomDescription() + "\", "
                             + "\"duration\": " + re.getDuration() + "}, ";
+                        }
                     }
                 }
             }
@@ -372,17 +378,17 @@ public class SemanticResource {
             returnJson = returnJson.substring(0, returnJson.length() - 2);
         returnJson += "]";
         
-        return returnJson;
+        return Response.ok(returnJson).build();
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("persons/{ids: .*}/physical_spaces/{Q}/{W}/")
-    public String c(@PathParam("ids") List<PathSegment> ids, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
+    public Response getPhysicalSpaceByPersonAndTime(@PathParam("ids") List<PathSegment> ids, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
         Set<Person> personGroup = new HashSet<>();
         for (PathSegment id: ids) {
             Person p = dao.getPerson(Long.parseLong(id.getPath()));
-            if(p == null) return "[]";
+            if(p == null) Response.status(404).build();
             personGroup.add(p);
         }
         //if(personGroup.size() < 2 || personGroup.size() != ids.size()) return "[]";
@@ -413,13 +419,14 @@ public class SemanticResource {
                         }else{
                             r = dao.getPhysicalSpaceByMHub(re.getMhubID());
                         }
-                        if(r == null) return "[]";
+                        if(r != null){
 
                         returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
                             + "\"physical_space\": \"" + r.getRoomName() + "\", "
                             + "\"description\": \"" + r.getRoomDescription() + "\", "
                             + "\"arrive\": " + re.getArrive() + ", "
                             + "\"depart\": " + re.getDepart() + "}, ";
+                        }
                     }
                 }
             }
@@ -428,7 +435,7 @@ public class SemanticResource {
             returnJson = returnJson.substring(0, returnJson.length() - 2);
         returnJson += "]";
         
-        return returnJson;
+        return Response.ok(returnJson).build();
     }
     
     // duration/thing/{thingID}

@@ -19,7 +19,7 @@ Thus, assuming that the server has been deployed at `http://localhost:8080`, all
 ### **GET**   `/physical_spaces/{id}/persons`
 #### Retrieve all the persons present now in an existing physical space
 This operation retrieves all the persons present now in the physical spaces with id equals `{id}`.
-If everything goes well, Attendance Service returns a response with HTTP status code 200 (OK).
+If everything goes well, Attendance Service returns a response with HTTP status code 200 (OK), otherwise it returns a response with HTTP status code 400 (BAD REQUEST).
 
  * Full URL: `http://localhost:8080/service` **`/physical_spaces/{id}/persons`**
  * HTTP Method: **GET**
@@ -61,7 +61,7 @@ Example:
 ### **GET**   `/physical_spaces/{id}/persons/{Q}/{W}`
 #### Retrieve all the persons present in an existing physical space in a given time
 This operation retrieves all the persons present in the physical spaces with id equals `{id}` in the time interval `{Q}` to `{W}`.
-If everything goes well, Attendance Service returns a response with HTTP status code 200 (OK).
+If everything goes well, Attendance Service returns a response with HTTP status code 200 (OK), otherwise it returns a response with HTTP status code 400 (BAD REQUEST).
 
  * Full URL: `http://localhost:8080/service` **`/physical_spaces/{id}/persons/{Q}/{W}`**
  * HTTP Method: **GET**
@@ -108,7 +108,7 @@ Example:
 ### **GET**   `/persons/{id/...}/rendezvous/{Q}/{W}`
 #### Retrieve a group of person who have met in a physical space in a given time
 This operation retrieves a group of persons who were present in a physical space in the same time lapse with id equals `{id}` in the time interval `{Q}` to `{W}`.
-If everything goes well, Attendance Service returns a response with HTTP status code 200 (OK).
+If everything goes well, Attendance Service returns a response with HTTP status code 200 (OK), otherwise it returns a response with HTTP status code 400 (BAD REQUEST).
 
  * Full URL: `http://localhost:8080/service` **`/persons/{id/...}/rendezvous/{Q}/{W}`**
  * HTTP Method: **GET**
@@ -154,7 +154,7 @@ Example:
 ### **GET**   `/persons/{id/...}/physical_spaces`
 #### Retrieve the physical space where the defined persons are present now
 This operation retrieves all the physical spaces where the existing persons with id equals the array `{id/...}` are present.
-If everything goes well, Attendance Service returns a response with HTTP status code 200 (OK).
+If everything goes well, Attendance Service returns a response with HTTP status code 200 (OK), otherwise it returns a response with HTTP status code 400 (BAD REQUEST).
 
  * Full URL: `http://localhost:8080/service` **`/persons/{id/...}/physical_spaces`**
  * HTTP Method: **GET**
@@ -196,7 +196,7 @@ Example:
 ### **GET**   `persons/{id/...}/physical_spaces/{Q}/{W}/`
 #### Retrieve the physical space where the defined persons were present in a given time
 This operation retrieves all the physical spaces where the existing persons with id equals the array `{id/...}` were present in the time interval `{Q}` to `{W}`.
-If everything goes well, Attendance Service returns a response with HTTP status code 200 (OK).
+If everything goes well, Attendance Service returns a response with HTTP status code 200 (OK), otherwise it returns a response with HTTP status code 400 (BAD REQUEST).
 
  * Full URL: `http://localhost:8080/service/` **`persons/{id/...}/physical_spaces/{Q}/{W}/`**
  * HTTP Method: **GET**

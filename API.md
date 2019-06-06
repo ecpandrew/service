@@ -103,7 +103,7 @@ Example:
 ]
 ```
 
-##Rendezvous
+## Rendezvous
 
 ### **GET**   `/persons/{id/...}/rendezvous/{Q}/{W}`
 #### Retrieve a group of person who have met in a physical space in a given time
@@ -149,7 +149,7 @@ Example:
 ]
 ```
 
-##Persons
+## Persons
 
 ### **GET**   `/persons/{id/...}/physical_spaces`
 #### Retrieve the physical space where the defined persons are present now

@@ -927,9 +927,14 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 if(data.length() != 0){
                 //text = data.getJSONObject(0);
                 
+                String desc = "";
+                if(!data.isNull("description")){
+                    desc = data.getString("description");
+                }
+                
                 r = new PhysicalSpace(text2.getLong("id"),
                         data.getString("name"),
-                        data.getString("description"));
+                        desc);
                 }
             }
         } catch (Exception ex) {
@@ -962,9 +967,14 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 if(data.length() != 0){
                 //text = data.getJSONObject(0);
                 
+                String desc = "";
+                if(!data.isNull("description")){
+                    desc = data.getString("description");
+                }
+                
                 r = new PhysicalSpace(text2.getLong("id"),
                         data.getString("name"),
-                        data.getString("description"));
+                        desc);
                 }
             }
         } catch (Exception ex) {

@@ -150,25 +150,22 @@ public class SemanticResource {
             }else{
                 for (Rendezvous re: rendezvousSet) {
                     Person p;
+                    PhysicalSpace r2;
                     if(MODE == 0){
                         p = dao.getPersonByMHub(re.getMhubID());
+                        r2 = dao.getPhysicalSpaceByThing(re.getThingID());
                     }else{
                         p = dao.getPersonByThing(re.getThingID());
+                        r2 = dao.getPhysicalSpaceByMHub(re.getMhubID());
                     }
                     //HasA h = dao.getHasAByDevice(d2.getDeviceID());
                     //Person p = dao.getPerson(h.getPersonID());
                     if(p == null) return "[]";
 
                     returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
-                            + "\"email\": \"" + p.getPersonEmail() + "\", ";
-
-                    if(MODE == 0){
-                        returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
-                    }else if(MODE == 1){
-                        returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
-                    }
-
-                    returnJson += "\"duration\": " + re.getDuration() + "}, ";
+                            + "\"email\": \"" + p.getPersonEmail() + "\", "
+                            + "\"physical_space\": \"" + r2.getRoomName() + "\", "
+                            + "\"duration\": " + re.getDuration() + "}, ";
                 }
             }
         }
@@ -208,26 +205,23 @@ public class SemanticResource {
             }else{
                 for (Rendezvous re: rendezvousSet) {
                     Person p;
+                    PhysicalSpace r2;
                     if(MODE == 0){
                         p = dao.getPersonByMHub(re.getMhubID());
+                        r2 = dao.getPhysicalSpaceByThing(re.getThingID());
                     }else{
                         p = dao.getPersonByThing(re.getThingID());
+                        r2 = dao.getPhysicalSpaceByMHub(re.getMhubID());
                     }
                     //HasA h = dao.getHasAByDevice(d2.getDeviceID());
                     //Person p = dao.getPerson(h.getPersonID());
                     if(p == null) return "[]";
 
                     returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
-                            + "\"email\": \"" + p.getPersonEmail() + "\", ";
-
-                    if(MODE == 0){
-                        returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
-                    }else if(MODE == 1){
-                        returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
-                    }
-
-                    returnJson += "\"arrive\": " + re.getArrive() + ", ";
-                    returnJson += "\"depart\": " + re.getDepart() + "}, ";
+                            + "\"email\": \"" + p.getPersonEmail() + "\", "
+                            + "\"physical_space\": \"" + r2.getRoomName() + "\", "
+                            + "\"arrive\": " + re.getArrive() + ", "
+                            + "\"depart\": " + re.getDepart() + "}, ";
                 }
             }
         }
@@ -367,13 +361,9 @@ public class SemanticResource {
                         if(r == null) return "[]";
 
                         returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
-                            + "\"physical_space\": \"" + r.getRoomName() + "\", ";
-                        if(MODE == 0){
-                            returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
-                        }else if(MODE == 1){
-                            returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
-                        }
-                        returnJson += "\"duration\": " + re.getDuration() + "}, ";
+                            + "\"physical_space\": \"" + r.getRoomName() + "\", "
+                            + "\"description\": \"" + r.getRoomDescription() + "\", "
+                            + "\"duration\": " + re.getDuration() + "}, ";
                     }
                 }
             }
@@ -426,14 +416,10 @@ public class SemanticResource {
                         if(r == null) return "[]";
 
                         returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
-                            + "\"physical_space\": \"" + r.getRoomName() + "\", ";
-                        if(MODE == 0){
-                            returnJson += "\"thingID\": \"" + re.getThingID() + "\", ";
-                        }else if(MODE == 1){
-                            returnJson += "\"mhubID\": \"" + re.getMhubID() + "\", ";
-                        }
-                        returnJson += "\"arrive\": " + re.getArrive() + ", ";
-                        returnJson += "\"depart\": " + re.getDepart() + "}, ";
+                            + "\"physical_space\": \"" + r.getRoomName() + "\", "
+                            + "\"description\": \"" + r.getRoomDescription() + "\", "
+                            + "\"arrive\": " + re.getArrive() + ", "
+                            + "\"depart\": " + re.getDepart() + "}, ";
                     }
                 }
             }

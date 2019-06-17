@@ -555,4 +555,144 @@ public class SemanticResource {
         }
         return false;
     }
+
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("physical_spaces/{ids: .*}/persons/")
+    public Response getPersonByPhysicalSpace(@PathParam("ids") List<PathSegment> ids) throws Exception {
+
+
+        Set<PhysicalSpace> physicalSpaceGroup = new HashSet<>();
+        for (PathSegment id: ids) {
+            PhysicalSpace p = dao.getPhysicalSpace(Long.parseLong(id.getPath()));
+            if(p == null) Response.status(404).build();
+            physicalSpaceGroup.add(p);
+        }
+        
+        String returnJson = "[";
+        for (PhysicalSpace p: physicalSpaceGroup){
+
+            Set<Device> deviceSet;
+            if(MODE == 0){
+                deviceSet = dao.getThingsByRoom(r.getRoomID());
+            }else{
+                deviceSet = dao.getMHubsByRoom(r.getRoomID());
+        
+            Set<Rendezvous> rendezvousSet = null;
+            for (Device d : deviceSet) {
+                if(MODE == 0){
+                    rendezvousSet = getDurationByThing(d.getUuID());  //duration/thing/{thingID}
+                }else if(MODE == 1){
+                    rendezvousSet = getDurationByMHub(d.getUuID());   //duration/mhub/{mhubID}
+                }
+                if(rendezvousSet == null || rendezvousSet.isEmpty()){
+                        returnJson += "";
+                }else{
+                    for (Rendezvous re: rendezvousSet) {
+                        Person p;
+                        PhysicalSpace r2;
+                        if(MODE == 0){
+                            p = dao.getPersonByMHub(re.getMhubID());
+                            r2 = dao.getPhysicalSpaceByThing(re.getThingID());
+                        }else{
+                            p = dao.getPersonByThing(re.getThingID());
+                            r2 = dao.getPhysicalSpaceByMHub(re.getMhubID());
+                        }
+                        //HasA h = dao.getHasAByDevice(d2.getDeviceID());
+                        //Person p = dao.getPerson(h.getPersonID());
+                        if(p != null){
+    
+                        returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
+                                + "\"email\": \"" + p.getPersonEmail() + "\", "
+                                + "\"physical_space\": \"" + r2.getRoomName() + "\", "
+                                + "\"duration\": " + re.getDuration() + "}, ";
+                        }
+                    }
+                }
+            }
+
+
+        }
+        
+        //Removes the last coma and space
+        if(returnJson.length() > 2)
+            returnJson = returnJson.substring(0, returnJson.length() - 2);
+        returnJson += "]";
+        return Response.ok(returnJson).build();
+        }   
+    }
+
+
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("physical_spaces/{ids: .*}/persons/{Q}/{W}/")
+    public Response getPersonByPhysicalSpaceAndTime(@PathParam("ids") List<PathSegment> ids, @PathParam("Q") long Q, @PathParam("W") long W) throws Exception {
+        PhysicalSpace r = dao.getPhysicalSpace(roomID);
+        if(r == null) return Response.status(404).build();
+        //Set<HasA> hasASet = dao.getHasAByRoom(r.getRoomID());
+        
+        
+        Set<PhysicalSpace> physicalSpaceGroup = new HashSet<>();
+        for (PathSegment id: ids) {
+            PhysicalSpace p = dao.getPhysicalSpace(Long.parseLong(id.getPath()));
+            if(p == null) Response.status(404).build();
+            physicalSpaceGroup.add(p);
+        }
+        
+        String returnJson = "[";
+        for (PhysicalSpace p: physicalSpaceGroup){
+
+            Set<Device> deviceSet;
+            if(MODE == 0){
+                deviceSet = dao.getThingsByRoom(r.getRoomID());
+            }else{
+                deviceSet = dao.getMHubsByRoom(r.getRoomID());
+            }
+            Set<Rendezvous> rendezvousSet = null;
+            for (Device d : deviceSet) {
+                if(MODE == 0){
+                    rendezvousSet = getDurationByThing(d.getUuID(), Q, W);  //duration/thing/{thingID}/{W}/{delta}
+                }else if(MODE == 1){
+                    rendezvousSet = getDurationByMHub(d.getUuID(), Q, W);   //duration/mhub/{mhubID}/{W}/{delta}
+                }
+                if(rendezvousSet == null || rendezvousSet.isEmpty()){
+                        returnJson += "";
+                }else{
+                    for (Rendezvous re: rendezvousSet) {
+                        Person p;
+                        PhysicalSpace r2;
+                        if(MODE == 0){
+                            p = dao.getPersonByMHub(re.getMhubID());
+                            r2 = dao.getPhysicalSpaceByThing(re.getThingID());
+                        }else{
+                            p = dao.getPersonByThing(re.getThingID());
+                            r2 = dao.getPhysicalSpaceByMHub(re.getMhubID());
+                        }
+                        //HasA h = dao.getHasAByDevice(d2.getDeviceID());
+                        //Person p = dao.getPerson(h.getPersonID());
+                        if(p != null){
+    
+                        returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
+                                + "\"email\": \"" + p.getPersonEmail() + "\", "
+                                + "\"physical_space\": \"" + r2.getRoomName() + "\", "
+                                + "\"arrive\": " + re.getArrive() + ", "
+                                + "\"depart\": " + re.getDepart() + "}, ";
+                        }
+                    }
+                }
+            }
+        }
+        //Removes the last coma and space
+        if(returnJson.length() > 2)
+            returnJson = returnJson.substring(0, returnJson.length() - 2);
+        returnJson += "]";
+        return Response.ok(returnJson).build();
+    }
+
+
+
+
+
 }

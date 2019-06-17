@@ -444,7 +444,7 @@ public class SemanticResource {
         long duration = 0;
         String url;
         String returnedJson;
-        Set<Rendezvous> rendezvousSet = null;
+        Set<Rendezvous> rendezvousSet = new HashSet<>();
         
         //Get Average Duration
         url = HORYS
@@ -455,7 +455,6 @@ public class SemanticResource {
         for(int i = 0; i < data.length(); i++){
             JSONObject text = data.getJSONObject(i);
 
-            rendezvousSet = new HashSet<>();
             mhubID = UUID.fromString(text.getString("mhubID"));
             duration = text.getLong("duration");
             if(duration != 0)
@@ -471,7 +470,7 @@ public class SemanticResource {
         long duration = 0;
         String url;
         String returnedJson;
-        Set<Rendezvous> rendezvousSet = null;
+        Set<Rendezvous> rendezvousSet = new HashSet<>();
         
         //Get Average Duration
         url = HORYS
@@ -482,7 +481,6 @@ public class SemanticResource {
         for(int i = 0; i < data.length(); i++){
             JSONObject text = data.getJSONObject(i);
 
-            rendezvousSet = new HashSet<>();
             thingID = UUID.fromString(text.getString("thingID"));
             duration = text.getLong("duration");
             if(duration != 0)

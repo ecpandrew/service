@@ -452,13 +452,14 @@ public class SemanticResource {
         returnedJson = REST.sendGet(url, "GET");
         
         JSONArray data = new JSONArray(returnedJson);
-        if(data.length() != 0){
-            JSONObject text = data.getJSONObject(0);
+        for(int i = 0; i < data.length(); i++){
+            JSONObject text = data.getJSONObject(i);
 
             rendezvousSet = new HashSet<>();
             mhubID = UUID.fromString(text.getString("mhubID"));
             duration = text.getLong("duration");
-            rendezvousSet.add(new Rendezvous(mhubID, thingID, duration));
+            if(duration != 0)
+               rendezvousSet.add(new Rendezvous(mhubID, thingID, duration));
         }
         
         return rendezvousSet;
@@ -478,13 +479,14 @@ public class SemanticResource {
         returnedJson = REST.sendGet(url, "GET");
         
         JSONArray data = new JSONArray(returnedJson);
-        if(data.length() != 0){
-            JSONObject text = data.getJSONObject(0);
+        for(int i = 0; i < data.length(); i++){
+            JSONObject text = data.getJSONObject(i);
 
             rendezvousSet = new HashSet<>();
             thingID = UUID.fromString(text.getString("thingID"));
             duration = text.getLong("duration");
-            rendezvousSet.add(new Rendezvous(mhubID, thingID, duration));
+            if(duration != 0)
+                rendezvousSet.add(new Rendezvous(mhubID, thingID, duration));
         }
         
         return rendezvousSet;

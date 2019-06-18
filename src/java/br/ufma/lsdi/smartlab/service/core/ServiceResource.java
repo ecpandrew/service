@@ -1,56 +1,39 @@
-package br.pucrio.inf.lac.hospital.semantic.wscore;
+package br.ufma.lsdi.smartlab.service.core;
 
-//import br.pucrio.inf.lac.hospital.horys.protocol.HORYSProtocol;
-//import br.pucrio.inf.lac.hospital.semantic.data.Beacon;
-import br.pucrio.inf.lac.hospital.semantic.data.Device;
-import br.pucrio.inf.lac.hospital.semantic.data.GroupRendezvous;
-//import br.pucrio.inf.lac.hospital.semantic.data.HasA;
-//import br.pucrio.inf.lac.hospital.semantic.data.MHub;
-import br.pucrio.inf.lac.hospital.semantic.data.Person;
-import br.pucrio.inf.lac.hospital.semantic.data.Rendezvous;
-import br.pucrio.inf.lac.hospital.semantic.data.PhysicalSpace;
-//import br.pucrio.inf.lac.hospital.semantic.data.Thing;
-import br.pucrio.inf.lac.hospital.semantic.database.SemanticDao;
-import br.pucrio.inf.lac.hospital.semantic.database.SemanticDaoImpMariaDB;
+import br.ufma.lsdi.smartlab.service.data.Device;
+import br.ufma.lsdi.smartlab.service.data.GroupRendezvous;
+import br.ufma.lsdi.smartlab.service.data.Person;
+import br.ufma.lsdi.smartlab.service.data.Rendezvous;
+import br.ufma.lsdi.smartlab.service.data.PhysicalSpace;
+//import br.ufma.lsdi.smartlab.service.database.ServiceDaoImpMariaDB;
+import br.ufma.lsdi.smartlab.service.database.ServiceDaoImpSemantic;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
-//import java.io.BufferedReader;
-//import java.io.InputStreamReader;
-//import java.net.HttpURLConnection;
-//import java.net.URL;
 import java.util.ArrayList;
-//import java.util.Collections;
-//import java.util.Comparator;
-//import java.util.HashMap;
 import java.util.HashSet;
-//import java.util.LinkedList;
 import java.util.List;
-//import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.Produces;
-//import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-//import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
+import br.ufma.lsdi.smartlab.service.database.ServiceDao;
 
 /**
  * REST Web Service
  *
  */
 @Path("/")
-public class SemanticResource {
+public class ServiceResource {
 
-    private static SemanticDao dao = new SemanticDaoImpMariaDB();
+    private static ServiceDao dao = new ServiceDaoImpSemantic();
     
     private ObjectMapper mapper;
     
@@ -66,41 +49,17 @@ public class SemanticResource {
     @Context
     private UriInfo context;
     
-    //Compares two hospital by the nuber of patients at the moment
-    /*
-    private Comparator<Hospital> hospitalComparator = new Comparator<Hospital>() {
-        @Override
-        public int compare(Hospital h1, Hospital h2){
-            Occupancy oc1 = null;
-            try {
-                oc1 = getHospitalOccupancy(h1);
-            } catch (Exception ex) {
-                Logger.getLogger(SemanticResource.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            Integer patients1 = oc1.getnPatientsNow();
-            
-            Occupancy oc2 = null;
-            try {
-                oc2 = getHospitalOccupancy(h2);
-            } catch (Exception ex) {
-                Logger.getLogger(SemanticResource.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            Integer patients2 = oc2.getnPatientsNow();
-            
-            return patients1.compareTo(patients2);
-        }
-    };*/
 
     /**
      * Creates a new instance of SemanticResource
      */
-    public SemanticResource() {
+    public ServiceResource() {
         mapper = new ObjectMapper();
     }
 
     /**
      * Retrieves representation of an instance of
-     * br.pucrio.inf.lac.hospital.semanticws.core.SemanticResource
+ br.pucrio.inf.lac.hospital.semanticws.core.ServiceResource
      *
      * @return an instance of java.lang.String
      */

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.pucrio.inf.lac.hospital.semantic.wscore;
+package br.ufma.lsdi.smartlab.service.core;
 
 import java.util.Set;
 import javax.ws.rs.core.Application;
@@ -29,8 +29,8 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(br.pucrio.inf.lac.hospital.semantic.wscore.SemanticResource.class);
-        resources.add(br.pucrio.inf.lac.hospital.semantic.wscore.SimulatedhorizResource.class);
+        resources.add(br.ufma.lsdi.smartlab.service.core.ServiceResource.class);
+        resources.add(br.ufma.lsdi.smartlab.service.core.SimulatedhorizResource.class);
     }
     
 }

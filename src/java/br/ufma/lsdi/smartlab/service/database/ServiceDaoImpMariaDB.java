@@ -1,16 +1,15 @@
-package br.pucrio.inf.lac.hospital.semantic.database;
+package br.ufma.lsdi.smartlab.service.database;
 
-import br.pucrio.inf.lac.hospital.semantic.data.Beacon;
-import br.pucrio.inf.lac.hospital.semantic.data.Device;
-import br.pucrio.inf.lac.hospital.semantic.data.HasA;
-import br.pucrio.inf.lac.hospital.semantic.data.MHub;
-import br.pucrio.inf.lac.hospital.semantic.data.Person;
-import br.pucrio.inf.lac.hospital.semantic.data.PhysicalSpace;
-import br.pucrio.inf.lac.hospital.semantic.data.Thing;
-import br.pucrio.inf.lac.hospital.semantic.wscore.REST;
+import br.ufma.lsdi.smartlab.service.data.Beacon;
+import br.ufma.lsdi.smartlab.service.data.Device;
+import br.ufma.lsdi.smartlab.service.data.HasA;
+import br.ufma.lsdi.smartlab.service.data.MHub;
+import br.ufma.lsdi.smartlab.service.data.Person;
+import br.ufma.lsdi.smartlab.service.data.PhysicalSpace;
+import br.ufma.lsdi.smartlab.service.data.Thing;
+import br.ufma.lsdi.smartlab.service.core.REST;
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
-//import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,11 +26,11 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class SemanticDaoImpMariaDB implements SemanticDao{
+public class ServiceDaoImpMariaDB implements ServiceDao{
     private Connection conn;
     private final String semantic = "http://smartlab.lsdi.ufma.br/semantic/api/";
     
-    public SemanticDaoImpMariaDB(){
+    public ServiceDaoImpMariaDB(){
         //connectToDB();
     }
     
@@ -44,7 +43,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         try {
             conn = DriverManager.getConnection(url, props);
         } catch (SQLException ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -54,7 +53,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         try {
             return (!conn.isClosed());
         } catch (SQLException ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
     }
@@ -64,12 +63,12 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
             if(conn == null || conn.isClosed())
                 return;
         } catch (SQLException ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             conn.close();
         } catch (SQLException ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -95,7 +94,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
             rs.close();
             st.close();
         } catch (SQLException ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
         return result;
@@ -130,7 +129,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
             rs.close();
             st.close();
         } catch (SQLException ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
         return result;
@@ -150,7 +149,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
             rowsUpdated = st.executeUpdate(sql);
             st.close();
         } catch (SQLException ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
             return -1;
         }
         return rowsUpdated;
@@ -174,7 +173,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
             rs.close();
             st.close();
         } catch (SQLException ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
             return -1;
         }
         return (generatedKey==0)? -1 : generatedKey;
@@ -497,7 +496,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                         data.getString("description"));
             }
         } catch (Exception ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         return r;
     }
@@ -545,7 +544,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 resultSet.add(d);
             }
         } catch (Exception ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return resultSet;
@@ -574,7 +573,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 resultSet.add(d);
             }
         } catch (Exception ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return resultSet;
@@ -603,7 +602,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 resultSet.add(d);
             }
         } catch (Exception ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return resultSet;
@@ -632,7 +631,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 resultSet.add(d);
             }
         } catch (Exception ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return resultSet;
@@ -813,7 +812,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                         data.getString("email"));
             }
         } catch (Exception ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         return p;
     }
@@ -870,7 +869,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         return p;
     }
@@ -907,7 +906,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         return p;
     }
@@ -949,7 +948,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         return r;
     }
@@ -991,7 +990,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         return r;
     }
@@ -1001,7 +1000,7 @@ public class SemanticDaoImpMariaDB implements SemanticDao{
         try{
             r = new String(s.getBytes("ISO-8859-1"), "UTF-8");
         }catch(UnsupportedEncodingException ex){
-            Logger.getLogger(SemanticDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServiceDaoImpMariaDB.class.getName()).log(Level.SEVERE, null, ex);
         }
         return r;
     }

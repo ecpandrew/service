@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.pucrio.inf.lac.hospital.semantic.wscore;
+package br.ufma.lsdi.smartlab.service.core;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

@@ -1,4 +1,4 @@
-package br.pucrio.inf.lac.hospital.semantic.data;
+package br.ufma.lsdi.smartlab.service.data;
 
 import java.util.HashSet;
 import java.util.Set;

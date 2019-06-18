@@ -1,6 +1,5 @@
-package br.pucrio.inf.lac.hospital.semantic.wscore;
+package br.ufma.lsdi.smartlab.service.core;
 
-import br.pucrio.inf.lac.hospital.horys.protocol.HORYSProtocol;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -125,7 +124,7 @@ public class SimulatedhorizResource {
         return reply.toString();
     }
     
-    @GET
+    /*@GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("avgrendevouzduration/{thingid}")
     public String getAverageRendezvousDuration(@PathParam("thingid") String strThingID) throws JsonProcessingException {
@@ -145,7 +144,7 @@ public class SimulatedhorizResource {
         HORYSProtocol hp = new HORYSProtocol(HORYSProtocol.Mode.REPLY, HORYSProtocol.Operation.GETAVGRENDEZVOUSDURATION, replyParameters);
         
         return mapper.writeValueAsString(hp);
-    }
+    }*/
     /* 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

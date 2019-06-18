@@ -1,8 +1,10 @@
 package br.pucrio.inf.lac.hospital.semantic.wscore;
 
+import br.ufma.lsdi.smartlab.service.core.ServiceResource;
+
 public class SemanticResourceTest {
     public static void main(String[] args) throws Exception {
-        SemanticResource sr = new SemanticResource();
+        ServiceResource sr = new ServiceResource();
         System.out.println(sr.getHospitalByCity("city"));
         System.out.println(sr.getHospitalByID(1));
         System.out.println(sr.getHospitalByInsuraceAndCity(1, "city"));

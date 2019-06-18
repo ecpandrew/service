@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.pucrio.inf.lac.hospital.semantic.data;
+package br.ufma.lsdi.smartlab.service.data;
 
 import java.util.UUID;
 

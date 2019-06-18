@@ -1,11 +1,13 @@
 package br.pucrio.inf.lac.hospital.semantic.database;
-import br.pucrio.inf.lac.hospital.semantic.data.*;
+import br.ufma.lsdi.smartlab.service.database.ServiceDaoImpMariaDB;
+import br.ufma.lsdi.smartlab.service.data.Beacon;
+import br.ufma.lsdi.smartlab.service.data.PhysicalSpace;
 import java.sql.Date;
 
 import java.util.UUID;
 public class SemanticDaoImpMariaDBTest {
     
-    private static SemanticDaoImpMariaDB dao = new SemanticDaoImpMariaDB();
+    private static ServiceDaoImpMariaDB dao = new ServiceDaoImpMariaDB();
     
     long adID, hID, rID, bID, pID, sID, vID, iID, acID;
 
@@ -35,7 +37,7 @@ public class SemanticDaoImpMariaDBTest {
         hID = dao.insertHospital(h);
         System.out.println("Insert Hospital = "+hID);
         
-        Room r = new Room("rooName", "roomType", hID);
+        PhysicalSpace r = new PhysicalSpace("rooName", "roomType", hID);
         rID = dao.insertRoom(r);
         System.out.println("Insert Room = "+rID);
         
@@ -68,7 +70,7 @@ public class SemanticDaoImpMariaDBTest {
         Beacon b = new Beacon(bID, rID, UUID.randomUUID(), true, new Date(System.currentTimeMillis()));
         System.out.println("Update Beacon = "+dao.updateBeacon(b));
         
-        Room r = new Room(rID, "rooName2", "roomType2", hID);
+        PhysicalSpace r = new PhysicalSpace(rID, "rooName2", "roomType2", hID);
         System.out.println("Update Room = "+dao.updateRoom(r));
         
         Visit v = new Visit(vID,pID,hID, sID, new Date(System.currentTimeMillis()), (byte)5, (byte)5, null, null);

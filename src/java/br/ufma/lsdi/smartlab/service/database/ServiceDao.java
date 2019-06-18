@@ -1,16 +1,15 @@
-package br.pucrio.inf.lac.hospital.semantic.database;
+package br.ufma.lsdi.smartlab.service.database;
 
-import br.pucrio.inf.lac.hospital.semantic.data.Beacon;
-import br.pucrio.inf.lac.hospital.semantic.data.Device;
-import br.pucrio.inf.lac.hospital.semantic.data.HasA;
-import br.pucrio.inf.lac.hospital.semantic.data.MHub;
-import br.pucrio.inf.lac.hospital.semantic.data.Person;
-import br.pucrio.inf.lac.hospital.semantic.data.PhysicalSpace;
-//import br.pucrio.inf.lac.hospital.semantic.data.Thing;
+import br.ufma.lsdi.smartlab.service.data.Beacon;
+import br.ufma.lsdi.smartlab.service.data.Device;
+import br.ufma.lsdi.smartlab.service.data.HasA;
+import br.ufma.lsdi.smartlab.service.data.MHub;
+import br.ufma.lsdi.smartlab.service.data.Person;
+import br.ufma.lsdi.smartlab.service.data.PhysicalSpace;
 import java.util.Set;
 import java.util.UUID;
 
-public interface SemanticDao {
+public interface ServiceDao {
     /**
      * Insert Object
      * the only parameter is the object to be inserted

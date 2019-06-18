@@ -1,5 +1,6 @@
 package br.pucrio.inf.lac.hospital.semantic.wscore;
 
+import br.ufma.lsdi.smartlab.service.core.SimulatedhorizResource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.UUID;
 

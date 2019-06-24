@@ -10,7 +10,7 @@ import javax.ws.rs.core.Application;
 
 /**
  *
- * @author fbeneditovm
+ * @author carvalhodaniels
  */
 @javax.ws.rs.ApplicationPath("/")
 public class ApplicationConfig extends Application {
@@ -30,6 +30,7 @@ public class ApplicationConfig extends Application {
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(br.ufma.lsdi.smartlab.service.core.ServiceResource.class);
+        //resources.add(br.ufma.lsdi.smartlab.service.core.SimulatedhorizResource.class);
         resources.add(br.ufma.lsdi.smartlab.service.core.SimulatedhorizResource.class);
     }
     

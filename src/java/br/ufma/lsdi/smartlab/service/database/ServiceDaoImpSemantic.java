@@ -5,7 +5,6 @@ import br.ufma.lsdi.smartlab.service.data.MHub;
 import br.ufma.lsdi.smartlab.service.data.Person;
 import br.ufma.lsdi.smartlab.service.data.PhysicalSpace;
 import br.ufma.lsdi.smartlab.service.data.Thing;
-import br.ufma.lsdi.smartlab.service.core.REST;
 import br.ufma.lsdi.smartlab.service.data.Beacon;
 import br.ufma.lsdi.smartlab.service.data.HasA;
 import java.sql.Connection;

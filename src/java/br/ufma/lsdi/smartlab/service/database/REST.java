@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.ufma.lsdi.smartlab.service.core;
+package br.ufma.lsdi.smartlab.service.database;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -12,7 +12,7 @@ import java.net.URL;
 
 /**
  *
- * @author dsc_7
+ * @author carvalhodaniels
  */
 public class REST {
     public static String sendGet(String url, String method) throws Exception {

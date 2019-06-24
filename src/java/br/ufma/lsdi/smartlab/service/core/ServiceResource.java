@@ -5,18 +5,16 @@ import br.ufma.lsdi.smartlab.service.data.GroupRendezvous;
 import br.ufma.lsdi.smartlab.service.data.Person;
 import br.ufma.lsdi.smartlab.service.data.Rendezvous;
 import br.ufma.lsdi.smartlab.service.data.PhysicalSpace;
+import br.ufma.lsdi.smartlab.service.database.ServiceDao;
 //import br.ufma.lsdi.smartlab.service.database.ServiceDaoImpMariaDB;
 import br.ufma.lsdi.smartlab.service.database.ServiceDaoImpSemantic;
+import br.ufma.lsdi.smartlab.service.database.RendezvousDao;
+import br.ufma.lsdi.smartlab.service.database.RendezvousDaoImpHorys;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
@@ -24,31 +22,25 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
-import br.ufma.lsdi.smartlab.service.database.ServiceDao;
 
 /**
  * REST Web Service
  *
+ * @author carvalhodaniels
  */
 @Path("/")
 public class ServiceResource {
 
     private static ServiceDao dao = new ServiceDaoImpSemantic();
+    private static RendezvousDao rendezvous = new RendezvousDaoImpHorys();
     
     private ObjectMapper mapper;
-    
-    /** The  Horys restport. */
-    private final String HORYS = "http://smartlab.lsdi.ufma.br/horys";
-    private final String sHORYS = "http://localhost:8080/service/webresources/simulatedhoriz";
     
     /** The Service Mode: */
     /** 0: Room has a beacon, Person has a mhub */
     /** 1: Room has a mhub, Person has a beacon */
     private final Integer MODE = 0;
 
-    @Context
-    private UriInfo context;
-    
 
     /**
      * Creates a new instance of SemanticResource
@@ -103,9 +95,9 @@ public class ServiceResource {
             Set<Rendezvous> rendezvousSet = null;
             for (Device d : deviceSet) {
                 if(MODE == 0){
-                    rendezvousSet = getDurationByThing(d.getUuID());  //duration/thing/{thingID}
+                    rendezvousSet = rendezvous.getDurationByThing(d.getUuID());  //duration/thing/{thingID}
                 }else if(MODE == 1){
-                    rendezvousSet = getDurationByMHub(d.getUuID());   //duration/mhub/{mhubID}
+                    rendezvousSet = rendezvous.getDurationByMHub(d.getUuID());   //duration/mhub/{mhubID}
                 }
                 if(rendezvousSet == null || rendezvousSet.isEmpty()){
                         returnJson += "";
@@ -162,9 +154,9 @@ public class ServiceResource {
             Set<Rendezvous> rendezvousSet = null;
             for (Device d : deviceSet) {
                 if(MODE == 0){
-                    rendezvousSet = getDurationByThing(d.getUuID(), Q, W);  //duration/thing/{thingID}/{W}/{delta}
+                    rendezvousSet = rendezvous.getDurationByThing(d.getUuID(), Q, W);  //duration/thing/{thingID}/{W}/{delta}
                 }else if(MODE == 1){
-                    rendezvousSet = getDurationByMHub(d.getUuID(), Q, W);   //duration/mhub/{mhubID}/{W}/{delta}
+                    rendezvousSet = rendezvous.getDurationByMHub(d.getUuID(), Q, W);   //duration/mhub/{mhubID}/{W}/{delta}
                 }
                 if(rendezvousSet == null || rendezvousSet.isEmpty()){
                         returnJson += "";
@@ -226,9 +218,9 @@ public class ServiceResource {
             Set<Rendezvous> rendezvousSet;
             for (Device d : deviceSet) {
                 if(MODE == 0){
-                    rendezvousSet = getDurationByMHub(d.getUuID(), Q, W);   //duration/thing/{thingID}/{W}/{delta}
+                    rendezvousSet = rendezvous.getDurationByMHub(d.getUuID(), Q, W);   //duration/thing/{thingID}/{W}/{delta}
                 }else{
-                    rendezvousSet = getDurationByThing(d.getUuID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
+                    rendezvousSet = rendezvous.getDurationByThing(d.getUuID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
                 }
                 if(rendezvousSet != null && !rendezvousSet.isEmpty()){
                     for (Rendezvous re: rendezvousSet) {
@@ -313,9 +305,9 @@ public class ServiceResource {
             Set<Rendezvous> rendezvousSet;
             for (Device d : deviceSet) {
                 if(MODE == 0){
-                    rendezvousSet = getDurationByMHub(d.getUuID());   //duration/mhub/{mhubID}
+                    rendezvousSet = rendezvous.getDurationByMHub(d.getUuID());   //duration/mhub/{mhubID}
                 }else{
-                    rendezvousSet = getDurationByThing(d.getUuID());  //duration/thing/{thingID}
+                    rendezvousSet = rendezvous.getDurationByThing(d.getUuID());  //duration/thing/{thingID}
                 }
                 if(rendezvousSet == null || rendezvousSet.isEmpty()){
                     returnJson += "";
@@ -369,9 +361,9 @@ public class ServiceResource {
             Set<Rendezvous> rendezvousSet;
             for (Device d : deviceSet) {
                 if(MODE == 0){
-                    rendezvousSet = getDurationByMHub(d.getUuID(), Q, W);   //duration/thing/{thingID}/{W}/{delta}
+                    rendezvousSet = rendezvous.getDurationByMHub(d.getUuID(), Q, W);   //duration/thing/{thingID}/{W}/{delta}
                 }else{
-                    rendezvousSet = getDurationByThing(d.getUuID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
+                    rendezvousSet = rendezvous.getDurationByThing(d.getUuID(), Q, W);  //duration/mhub/{mhubID}/{W}/{delta}
                 }
                 if(rendezvousSet == null || rendezvousSet.isEmpty()){
                     returnJson += "";
@@ -400,115 +392,6 @@ public class ServiceResource {
         returnJson += "]";
         
         return Response.ok(returnJson).build();
-    }
-    
-    // duration/thing/{thingID}
-    private Set<Rendezvous> getDurationByThing(UUID thingID) throws Exception {
-        UUID mhubID = null;
-        long duration = 0;
-        String url;
-        String returnedJson;
-        Set<Rendezvous> rendezvousSet = new HashSet<>();
-        
-        //Get Average Duration
-        url = HORYS
-                + "/api/duration/thing/"+thingID;
-        returnedJson = REST.sendGet(url, "GET");
-        
-        JSONArray data = new JSONArray(returnedJson);
-        for(int i = 0; i < data.length(); i++){
-            JSONObject text = data.getJSONObject(i);
-
-            mhubID = UUID.fromString(text.getString("mhubID"));
-            duration = text.getLong("duration");
-            if(duration != 0)
-               rendezvousSet.add(new Rendezvous(mhubID, thingID, duration));
-        }
-        
-        return rendezvousSet;
-    }
-    
-    // duration/mhub/{mhubID}
-    private Set<Rendezvous> getDurationByMHub(UUID mhubID) throws Exception {
-        UUID thingID = null;
-        long duration = 0;
-        String url;
-        String returnedJson;
-        Set<Rendezvous> rendezvousSet = new HashSet<>();
-        
-        //Get Average Duration
-        url = HORYS
-                + "/api/duration/mhub/"+mhubID;
-        returnedJson = REST.sendGet(url, "GET");
-        
-        JSONArray data = new JSONArray(returnedJson);
-        for(int i = 0; i < data.length(); i++){
-            JSONObject text = data.getJSONObject(i);
-
-            thingID = UUID.fromString(text.getString("thingID"));
-            duration = text.getLong("duration");
-            if(duration != 0)
-                rendezvousSet.add(new Rendezvous(mhubID, thingID, duration));
-        }
-        
-        return rendezvousSet;
-    }
-    
-    // duration/thing/{thingID}/{W}/delta
-    private Set<Rendezvous> getDurationByThing(UUID thingID, long Q, long W) throws Exception {
-        UUID mhubID = null;
-        long arrive = 0;
-        long depart = 0;
-        String url;
-        String returnedJson;
-        Set<Rendezvous> rendezvousSet = new HashSet<>();
-        long delta = W - Q;
-        
-        //Get Average Duration
-        url = HORYS
-                + "/api/duration/thing/"+thingID+"/"+W+"/"+delta;
-        returnedJson = REST.sendGet(url, "GET");
-        
-        JSONArray data = new JSONArray(returnedJson);
-        for(int i = 0; i < data.length(); i++){
-            JSONObject text = data.getJSONObject(i);
-
-            mhubID = UUID.fromString(text.getString("mhubID"));
-            arrive = text.getLong("arrive");
-            depart = text.getLong("depart");
-            if(arrive != depart)
-                rendezvousSet.add(new Rendezvous(mhubID, thingID, arrive, depart));
-        }
-        
-        return rendezvousSet;
-    }
-    
-    // duration/mhub/{mhubID}/{W}/{delta}
-    private Set<Rendezvous> getDurationByMHub(UUID mhubID, long Q, long W) throws Exception {
-        UUID thingID = null;
-        long arrive = 0;
-        long depart = 0;
-        String url;
-        String returnedJson;
-        Set<Rendezvous> rendezvousSet = new HashSet<>();
-        long delta = W - Q;
-        
-        //Get Average Duration
-        url = HORYS
-                + "/api/duration/mhub/"+mhubID+"/"+W+"/"+delta;
-        returnedJson = REST.sendGet(url, "GET");
-        
-        JSONArray data = new JSONArray(returnedJson);
-       for(int i = 0; i < data.length(); i++){
-            JSONObject text = data.getJSONObject(i);
-
-            thingID = UUID.fromString(text.getString("thingID"));
-            arrive = text.getLong("arrive");
-            depart = text.getLong("depart");
-            rendezvousSet.add(new Rendezvous(mhubID, thingID, arrive, depart));
-        }
-        
-        return rendezvousSet;
     }
         
     private boolean containsGroupRendezvous(ArrayList<GroupRendezvous> grs, GroupRendezvous gr){

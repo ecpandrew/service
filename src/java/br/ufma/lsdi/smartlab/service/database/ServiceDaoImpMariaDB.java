@@ -7,7 +7,6 @@ import br.ufma.lsdi.smartlab.service.data.MHub;
 import br.ufma.lsdi.smartlab.service.data.Person;
 import br.ufma.lsdi.smartlab.service.data.PhysicalSpace;
 import br.ufma.lsdi.smartlab.service.data.Thing;
-import br.ufma.lsdi.smartlab.service.core.REST;
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DriverManager;

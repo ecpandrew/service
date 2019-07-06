@@ -162,7 +162,14 @@ public interface ServiceDao {
      * @return the Person
      */
     public Person getPerson(long personID);
-    
+
+
+    public Person getPerson_(long personID);
+
+
+
+
+
     /**
      * Gets a specific Person
      * @param personEmail the email of the Person

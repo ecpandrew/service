@@ -815,7 +815,12 @@ public class ServiceDaoImpMariaDB implements ServiceDao{
         }
         return p;
     }
-    
+
+    @Override
+    public Person getPerson_(long personID) {
+        return null;
+    }
+
     @Override
     public Person getPersonByEmail(String personEmail){
         String sql = "SELECT * FROM Person "

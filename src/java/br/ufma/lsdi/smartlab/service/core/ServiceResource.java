@@ -286,7 +286,7 @@ public class ServiceResource {
     public Response getPhysicalSpaceByPerson(@PathParam("ids") List<PathSegment> ids) throws Exception {
         Set<Person> personGroup = new HashSet<>();
         for (PathSegment id: ids) {
-            Person p = dao.getPerson(Long.parseLong(id.getPath()));
+            Person p = dao.getPerson_(Long.parseLong(id.getPath()));
             if(p == null) Response.status(404).build();
             personGroup.add(p);
         }
@@ -322,6 +322,7 @@ public class ServiceResource {
                         if(r != null){
 
                         returnJson += "{\"shortName\": \"" + p.getShortName() + "\", "
+                            + "\"roles\": \"" + p.getRoles() + "\", "
                             + "\"physical_space\": \"" + r.getRoomName() + "\", "
                             + "\"description\": \"" + r.getRoomDescription() + "\", "
                             + "\"duration\": " + re.getDuration() + "}, ";

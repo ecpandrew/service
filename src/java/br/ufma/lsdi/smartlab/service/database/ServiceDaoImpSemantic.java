@@ -191,7 +191,34 @@ public class ServiceDaoImpSemantic implements ServiceDao{
         }
         return p;
     }
-    
+
+    @Override
+    public Person getPerson_(long personID) {
+        String url;
+        String returnedJson;
+        JSONObject data;
+        Person p = null;
+
+        url = semantic+ "persons/"+personID;
+        try {
+            returnedJson = REST.sendGet(url, "GET");
+            if(returnedJson == null) return null;
+            data = new JSONObject(returnedJson);
+
+            if(data.length() != 0){
+                //JSONObject text = data.getJSONObject(0);
+
+                p = new Person(personID,
+                        data.getString("shortName"),
+                        data.getString("email"),
+                        data.getString("roles"));
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(ServiceDaoImpSemantic.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return p;
+    }
+
     @Override
     public Person getPersonByMHub(UUID mhubID) {
         String url;
